@@ -8,25 +8,6 @@ from ..models import VegetationMapByHRU, ProjectionInformation
 LEHMAN_CREEK_CELLSIZE = 100  # in meters; should be in netCDF, but it's not
 
 
-def propagate_single_vegetation_change(original_prms_params, veg_value, hrus):
-    """
-    Given a PRMS netCDF file, a PRMS vegetation code (0-4), and a list of
-    HRU indices that should be changed, update the seven other
-    vegetation-dependent parameters.
-
-    Arguments:
-        original_prms_params (netCDF4.Dataset): The original parameters file
-        veg_value (int): The vegetation value, must be 0, 1, 2, 3, or 4
-        hrus (list(int)): List of HRU indices that should get the value given
-    """
-    assert veg_value in range(5), \
-        "PRMS Vegetation Values must be an integer from 0 to 4"
-
-    mod_prms_params = netCDF4.Dataset()
-
-    return mod_prms_params
-
-
 def propagate_all_vegetation_changes(original_prms_params, veg_map_by_hru):
     """
     Given a vegetation_updates object and an original_parameters netcdf,
@@ -51,10 +32,11 @@ def propagate_all_vegetation_changes(original_prms_params, veg_map_by_hru):
     return ret
 
 
-def get_veg_map_by_hru(prms_params):
+def get_veg_map_by_hru(prms_params_file):
     """
     TODO will replace add_values_into_json
     """
+    prms_params = netCDF4.Dataset(prms_params_file, 'r')
     # latitudes read from top to bottom
     upper_right_lat = prms_params.variables['lat'][:][0]
     lower_left_lat = prms_params.variables['lat'][:][-1]

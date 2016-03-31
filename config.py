@@ -1,7 +1,6 @@
 """
 Configuration for Flask Application 'NKN Metadata Editor'
 """
-import netCDF4
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -20,7 +19,7 @@ class DevelopmentConfig(Config):
 
     MONGODB_SETTINGS = {'db': 'scenarios'}
 
-    BASE_PARAMETER_NC = netCDF4.Dataset('app/static/data/parameter.nc', 'r')
+    BASE_PARAMETER_NC = 'app/static/data/parameter.nc'
 
 
 class TestingConfig(Config):
@@ -28,7 +27,7 @@ class TestingConfig(Config):
 
     MONGODB_SETTINGS = {'db': 'scenarios_test'}
 
-    BASE_PARAMETER_NC = netCDF4.Dataset('test/data/parameter.nc', 'r')
+    BASE_PARAMETER_NC = 'test/data/parameter.nc'
 
 
 class ProductionConfig(Config):

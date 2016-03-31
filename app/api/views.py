@@ -6,13 +6,15 @@ Date: Feb 25 2016
 from flask import jsonify, request, Response
 from flask import current_app as app
 
+import ast
 import math
 import json
 import datetime
 
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
-from util import propagate_all_vegetation_changes, get_veg_map_by_hru
+from util import get_veg_map_by_hru
+from PRMSCoverageTool import ScenarioRun
 
 
 @api.route('/api/scenarios/<scenario_id>', methods=['GET', 'DELETE'])
@@ -76,7 +78,6 @@ def scenarios():
 
         # this is for the first three scenarios only
         if app.config['DEBUG'] and len(scenarios) < 3:
-            #_init_dev_db(app.config['BASE_PARAMETER_NC'])
             for loop_counter in range(3):
                 _init_dev_db(app.config['BASE_PARAMETER_NC'],loop_counter)
 
@@ -89,17 +90,29 @@ def scenarios():
         BASE_PARAMETER_NC = app.config['BASE_PARAMETER_NC']
 
         # assemble parts of a new scenario record
-        veg_map_by_hru = json.dumps(request.json['veg_map_by_hru'])
+        # vegmap_json = json.dumps(request.json['veg_map_by_hru'])
+        vegmap_json = request.json['veg_map_by_hru']
 
         name = request.json['name']
 
         time_received = datetime.datetime.now()
 
-        updated_parameter_nc = propagate_all_vegetation_changes(
-            BASE_PARAMETER_NC, veg_map_by_hru
-        )
+        scenario_run = ScenarioRun(BASE_PARAMETER_NC)
+        scenario_run.initialize(name)
 
-        updated_veg_map_by_hru = get_veg_map_by_hru(updated_parameter_nc)
+        scenario_run.update_cov_type(vegmap_json['bare_ground'], 0)
+        scenario_run.update_cov_type(vegmap_json['grasses'], 1)
+        scenario_run.update_cov_type(vegmap_json['shrubs'], 2)
+        scenario_run.update_cov_type(vegmap_json['trees'], 3)
+        scenario_run.update_cov_type(vegmap_json['conifers'], 4)
+
+        # scenario_run.run()
+
+        scenario_run.end()
+
+        updated_veg_map_by_hru = get_veg_map_by_hru(
+            scenario_run.scenario_file
+        )
 
         # TODO placeholder
         time_finished = datetime.datetime.now()
@@ -146,12 +159,11 @@ def hru_veg_json():
         )
 
 
-#def _init_dev_db(BASE_PARAMETER_NC):
 def _init_dev_db(BASE_PARAMETER_NC, scenario_num=0):
     """
 
     """
-    name = 'Demo development scenario' + str(scenario_num)
+    name = 'Demo development scenario ' + str(scenario_num)
     time_received = datetime.datetime.now()
 
     updated_veg_map_by_hru = get_veg_map_by_hru(BASE_PARAMETER_NC)
@@ -169,7 +181,10 @@ def _init_dev_db(BASE_PARAMETER_NC, scenario_num=0):
 
     # use simple exponentials as the prototype data
     x = range(365)
-    streamflow_array = [pow(math.e, -pow(((i - 200.0 + 50*scenario_num)/100.0), 2)) for i in x]
+    streamflow_array = [
+        pow(math.e, -pow(((i - 200.0 + 50*scenario_num)/100.0), 2))
+        for i in x
+    ]
 
     hydrograph = Hydrograph(
         time_array=time_array,
