@@ -34,7 +34,14 @@ def propagate_all_vegetation_changes(original_prms_params, veg_map_by_hru):
 
 def get_veg_map_by_hru(prms_params_file):
     """
-    TODO will replace add_values_into_json
+    Create the vegetation map by HRU, which will also include the elevations
+    in an array indexed by HRU.
+
+    Arguments:
+        prms_params (netCDF4.Dataset): PRMS parameters netCDF
+    Returns:
+        (VegetationMapByHRU): JSON representation of the vegetation and
+            elevation by HRU
     """
     prms_params = netCDF4.Dataset(prms_params_file, 'r')
     # latitudes read from top to bottom
@@ -67,4 +74,7 @@ def get_veg_map_by_hru(prms_params_file):
         projection_information=projection_information
     )
 
-    return json.loads(vegmap.to_json())
+    ret = json.loads(vegmap.to_json())
+    ret['elevation'] = prms_params.variables['hru_elev'][:].flatten().tolist()
+
+    return ret
