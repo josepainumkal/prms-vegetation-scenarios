@@ -6,7 +6,6 @@ Date: Feb 25 2016
 from flask import jsonify, request, Response
 from flask import current_app as app
 
-import ast
 import math
 import json
 import datetime
@@ -79,10 +78,9 @@ def scenarios():
         # this is for the first three scenarios only
         if app.config['DEBUG'] and len(scenarios) < 3:
             for loop_counter in range(3):
-                _init_dev_db(app.config['BASE_PARAMETER_NC'],loop_counter)
+                _init_dev_db(app.config['BASE_PARAMETER_NC'], loop_counter)
 
                 scenarios = Scenario.objects
-
 
         return jsonify(scenarios=scenarios)
 
