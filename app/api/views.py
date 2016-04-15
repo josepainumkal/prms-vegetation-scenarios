@@ -88,7 +88,6 @@ def scenarios():
         BASE_PARAMETER_NC = app.config['BASE_PARAMETER_NC']
 
         # assemble parts of a new scenario record
-        # vegmap_json = json.dumps(request.json['veg_map_by_hru'])
         vegmap_json = request.json['veg_map_by_hru']
 
         name = request.json['name']
@@ -104,7 +103,7 @@ def scenarios():
         scenario_run.update_cov_type(vegmap_json['trees'], 3)
         scenario_run.update_cov_type(vegmap_json['conifers'], 4)
 
-        # scenario_run.run()
+        modelserver_run = scenario_run.run()
 
         scenario_run.end()
 
@@ -115,11 +114,26 @@ def scenarios():
         # TODO placeholder
         time_finished = datetime.datetime.now()
 
-        # TODO placeholder
-        inputs = Inputs()
+        resources = modelserver_run.resources
+
+        control =\
+            filter(lambda x: 'control' == x.resource_type, resources
+                   ).pop().resource_url
+        parameter =\
+            filter(lambda x: 'param' == x.resource_type, resources
+                   ).pop().resource_url
+        data =\
+            filter(lambda x: 'data' == x.resource_type, resources
+                   ).pop().resource_url
+
+        inputs = Inputs(control=control, parameter=parameter, data=data)
 
         # TODO placeholder
-        outputs = Outputs()
+        statsvar =\
+            filter(lambda x: 'statsvar' == x.resource_type, resources
+                   ).pop().resource_url
+
+        outputs = Outputs(statsvar=statsvar)
 
         # TODO placeholder
         hydrograph = Hydrograph(

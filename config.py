@@ -20,7 +20,7 @@ class DevelopmentConfig(Config):
 
     MONGODB_SETTINGS = {'db': 'scenarios'}
 
-    BASE_PARAMETER_NC = 'app/static/data/parameter.nc'
+    BASE_PARAMETER_NC = 'app/static/data/LC.param.nc'
 
     VWMODELS_HOST =\
         os.getenv('MODEL_HOST', default='http://192.168.99.100:5000')

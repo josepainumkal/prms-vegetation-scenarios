@@ -50,6 +50,14 @@ $(document).ready(function(){
   var firstPosition;
   var secondPosition;
 
+  var vegCodeLookup = {
+    0: 'bare_ground',
+    1: 'grasses',
+    2: 'shrubs',
+    3: 'trees',
+    4: 'conifers'
+  }
+
 
   $.get('/api/base-veg-map', function(data){
     inputJson = data;
@@ -171,12 +179,17 @@ $(document).ready(function(){
     $("#submitChangetoServerButton").click(function(){
       // update json file based on the current HRU values
       updateJson();
-      //var jsonStr = JSON.stringify(inputJson);
+      var scenarioName = $('#scenario-name-input').val();
       $.ajax({
           type : "POST",
-          url : "/api/base-veg-map",
-          data: JSON.stringify(inputJson, null, '\t'),
-          contentType: 'application/json;charset=UTF-8',
+          url : "/api/scenarios",
+          //data: JSON.stringify(inputJson, null, '\t'),
+          data: JSON.stringify(
+            {
+              veg_map_by_hru: inputJson,
+              name: scenarioName
+            }, null, '\t'),
+          contentType: 'application/json',
           success: function(result) {
           }
       });
@@ -229,8 +242,9 @@ $(document).ready(function(){
         for(var i=0 ; i<dataX ; i++)
         {
           hruNum = i + m*dataX;
-          vegType = vegCurrent[hruNum];
-          inputJson['vegetation_map'][vegType.toString()]['HRU_number'].push(hruNum);
+          vegCode = vegCurrent[hruNum];
+          vegType = vegCodeLookup[vegCode];
+          inputJson[vegType].push(hruNum);
         }
       }
   }

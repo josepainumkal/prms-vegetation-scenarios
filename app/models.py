@@ -50,7 +50,7 @@ class Outputs(db.EmbeddedDocument):
     """
     download links to PRMS outputs from scenario
     """
-    statvar = db.URLField(default='http://example.com/statvar.nc')
+    statsvar = db.URLField(default='http://example.com/statvar.nc')
 
 
 class Scenario(db.Document):

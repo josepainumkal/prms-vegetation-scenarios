@@ -2,8 +2,13 @@ __author__ = 'jerickson'
 
 import netCDF4
 import shutil
-import types
 import os
+import time
+
+from numpy import reshape
+
+from client.model_client.client import ModelApiClient
+from client.swagger_client.apis.default_api import DefaultApi
 
 
 class ScenarioRun:
@@ -17,12 +22,13 @@ class ScenarioRun:
     def __init__(self, basefile):
         self.basefile = basefile
         self.working_scenario = None
+        self.scenario_name = None
 
-    def initialize(self, scenarioname):
+    def initialize(self, scenario_name):
         '''
         Starts a new scenario based on the original file under a new name
 
-        :param scenarioname: Name of scenario to make a new file;
+        :param scenario_name: Name of scenario to make a new file;
             .nc will be appended
         :return:
         '''
@@ -30,16 +36,18 @@ class ScenarioRun:
             raise Exception("Working Scenario already open")
             return
 
-        if os.path.exists("{0}.nc".format(scenarioname)):
+        if os.path.exists("{0}.nc".format(scenario_name)):
             sequence = 2
-            while os.path.exists("{0}-{1}.nc".format(scenarioname, sequence)):
+            while os.path.exists("{0}-{1}.nc".format(scenario_name, sequence)):
                 sequence = sequence + 1
-            self.scenario_file = "{0}-{1}.nc".format(scenarioname, sequence)
+            self.scenario_file = "{0}-{1}.nc".format(scenario_name, sequence)
         else:
-            self.scenario_file = "{0}.nc".format(scenarioname)
+            self.scenario_file = "{0}.nc".format(scenario_name)
 
         shutil.copyfile(self.basefile, self.scenario_file)
         self.working_scenario = netCDF4.Dataset(self.scenario_file, 'r+')
+
+        self.scenario_name = scenario_name
 
     def end(self):
         '''
@@ -77,14 +85,70 @@ class ScenarioRun:
             return
 
         if hru != []:
-            self.working_scenario.variables['cov_type'][hru] = val
+            ctmat = self.working_scenario.variables['cov_type'][:]
+            ctvec = ctmat.flatten()
+            ctvec[hru] = val
+            self.working_scenario.variables['cov_type'][:] = \
+                reshape(ctvec, ctmat.shape)
 
-    def run(self):
+    def run(self, auth_host=None, model_host=None,
+            app_username=None, app_password=None):
         """
-        Where it will run!
+        Run PRMS on model server using the updated parameters file and
+        standard data.nc and control.nc files.
+
+        Arguments:
+            auth_host (str): hostname for the authentication server
+            model_host (str): hostname for the modeling server
+            app_username (str): username used on modeling/auth server
+            app_password (str): username used on modeling/auth server
+
+        Returns:
+            (client.swagger_client.models.model_run.ModelRun)
         """
-        # call Moinul's PRMS web service here!
-        pass
+        if self.working_scenario is None:
+            raise Exception("No working scenario defined")
+            return
+
+        auth_host = 'http://192.168.99.100:5005/api'
+        model_host = 'http://192.168.99.100:5000/api'
+        app_username = 'maturner01@gmail.com'
+        app_password = 'ajajaj'
+
+        cl = ModelApiClient(auth_host=auth_host, model_host=model_host)
+        cl.authenticate_jwt(username=app_username, password=app_password)
+
+        api = DefaultApi(api_client=cl)
+
+        mr = api.create_modelrun(
+            modelrun=dict(title=self.scenario_name, model_name='prms')
+        )
+
+        api.upload_resource_to_modelrun(
+            mr.id, 'control', 'app/static/data/LC.control'
+        )
+        api.upload_resource_to_modelrun(
+            mr.id, 'data', 'app/static/data/LC.data.nc'
+        )
+        api.upload_resource_to_modelrun(
+            mr.id, 'param', self.scenario_file
+        )
+
+        api.start_modelrun(mr.id)
+
+        run_not_finished = True
+        while run_not_finished:
+            state = api.get_modelrun_by_id(mr.id).progress_state
+            run_not_finished = (
+                state != 'FINISHED' and
+                state != 'ERROR'
+            )
+            time.sleep(0.5)
+
+        if state == 'ERROR':
+            raise RuntimeError('Model server execution failed!')
+
+        return api.get_modelrun_by_id(mr.id)
 
 
 if __name__ == "__main__":

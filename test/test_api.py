@@ -6,7 +6,6 @@ Date: 2016-03-10
 """
 import glob
 import json
-import glob
 import os
 import unittest
 
@@ -15,7 +14,7 @@ from datetime import datetime
 os.environ['FLASKCONFIG'] = 'testing'
 
 from manage import app
-from app.models import Scenario, VegetationMapByHRU
+from app.models import Scenario
 
 
 class TestAPI(unittest.TestCase):
@@ -82,10 +81,6 @@ class TestAPI(unittest.TestCase):
             os.remove(g)
         try:
             Scenario.drop_collection()
-
-            for g in glob.glob('test*.nc'):
-                os.remove(g)
-
         except:
             pass
 
@@ -95,25 +90,8 @@ class TestAPI(unittest.TestCase):
         """
         # check the results from posts above; maps should be updated as follows
 
-        vegmap1 = VegetationMapByHRU(
-            bare_ground=[0, 1, 2, 3, 5, 10, 11],
-            grasses=[4, 6, 7, 17, 18, 19],
-            shrubs=[9, 12, 13],
-            trees=[8, 14, 15, 16],
-            conifers=[]
-        )
-        scenario_is_correct(self.r1_scenario, 'test-scenario-1',
-                            expected_vegmap=vegmap1)
-
-        vegmap2 = VegetationMapByHRU(
-            bare_ground=[0, 10, 11],
-            grasses=[2, 3, 5, 7, 17, 18, 19],
-            shrubs=[9, 12, 13],
-            trees=[8, 14, 15, 16],
-            conifers=[4, 6, 1]
-        )
-        scenario_is_correct(self.r2_scenario, 'test-scenario-2',
-                            expected_vegmap=vegmap2)
+        scenario_is_correct(self.r1_scenario, 'test-scenario-1')
+        scenario_is_correct(self.r2_scenario, 'test-scenario-2')
 
         # check pulling all scenarios contains the two we've created
         all_scenarios_res = self.client.get('/api/scenarios')
@@ -138,10 +116,8 @@ class TestAPI(unittest.TestCase):
                 }
         ).data)['scenario'])
 
-        scenario_is_correct(single_scenario_1, 'test-scenario-1',
-                            expected_vegmap=vegmap1)
-        scenario_is_correct(single_scenario_2, 'test-scenario-2',
-                            expected_vegmap=vegmap2)
+        scenario_is_correct(single_scenario_1, 'test-scenario-1')
+        scenario_is_correct(single_scenario_2, 'test-scenario-2')
 
     def test_scenario_delete(self):
         """
@@ -168,7 +144,7 @@ def scenario_is_correct(scenario_from_server, expected_name,
                         # for now none of these need to be set
                         expected_time_received=None,
                         expected_time_finished=None,
-                        expected_vegmap=None, expected_inputs=None,
+                        expected_veg_map_by_hru=None, expected_inputs=None,
                         expected_outputs=None,
                         expected_projection_information=None,
                         expected_hydrograph=None):
@@ -176,21 +152,20 @@ def scenario_is_correct(scenario_from_server, expected_name,
     Helper function for testing correctness of scenarios from the server.
     """
     assert scenario_from_server['name'] == expected_name
-    vegmap_1 = scenario_from_server['veg_map_by_hru']
-    vegmap1_code0 = vegmap_1['bare_ground']
-    vegmap1_code1 = vegmap_1['grasses']
-    vegmap1_code2 = vegmap_1['shrubs']
-    vegmap1_code3 = vegmap_1['trees']
-    vegmap1_code4 = vegmap_1['conifers']
+
+    vegmap1_code0 = scenario_from_server['veg_map_by_hru']['bare_ground']
+    vegmap1_code1 = scenario_from_server['veg_map_by_hru']['grasses']
+    vegmap1_code2 = scenario_from_server['veg_map_by_hru']['shrubs']
+    vegmap1_code3 = scenario_from_server['veg_map_by_hru']['trees']
+    vegmap1_code4 = scenario_from_server['veg_map_by_hru']['conifers']
 
     # TODO this is just what exists currently in test/data/parameter.nc
     # after John Erickson's updates are worked in, update this
-    evg = expected_vegmap
-    assert set(vegmap1_code0) == set(evg.bare_ground)
-    assert set(vegmap1_code1) == set(evg.grasses)
-    assert set(vegmap1_code2) == set(evg.shrubs)
-    assert set(vegmap1_code3) == set(evg.trees)
-    assert set(vegmap1_code4) == set(evg.conifers)
+    assert vegmap1_code0 == [0, 1, 2, 10]
+    assert vegmap1_code1 == [3,  4,  8,  9, 11, 15, 16, 19]
+    assert vegmap1_code2 == [5,  6,  7, 17, 18]
+    assert vegmap1_code3 == [12, 13, 14]
+    assert vegmap1_code4 == []
 
     inputs = scenario_from_server['inputs']
     expected_inputs = {
