@@ -16,6 +16,7 @@ class VegetationMapByHRU(db.EmbeddedDocument):
     Vegetation map by HRU, modified as requested by the user
     """
     bare_ground = db.ListField(db.IntField())
+    elevation = db.ListField(db.FloatField())
     grasses = db.ListField(db.IntField())
     shrubs = db.ListField(db.IntField())
     trees = db.ListField(db.IntField())

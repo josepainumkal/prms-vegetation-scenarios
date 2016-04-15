@@ -4,6 +4,7 @@ Unit tests for server functions contained in app/api/views.py
 Author: Matthew A. Turner
 Date: 2016-03-10
 """
+import glob
 import json
 import glob
 import os
@@ -77,6 +78,8 @@ class TestAPI(unittest.TestCase):
 
     def tearDown(self):
 
+        for g in glob.glob('test-*'):
+            os.remove(g)
         try:
             Scenario.drop_collection()
 
