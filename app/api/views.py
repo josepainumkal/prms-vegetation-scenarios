@@ -3,12 +3,16 @@ PRMS Fire Modeling API
 
 Date: Feb 25 2016
 """
+import datetime
+import json
+import math
+import netCDF4
+import os
+
 from flask import jsonify, request, Response
 from flask import current_app as app
-
-import math
-import json
-import datetime
+from urllib import urlretrieve
+from uuid import uuid4
 
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
@@ -103,9 +107,10 @@ def scenarios():
         scenario_run.update_cov_type(vegmap_json['trees'], 3)
         scenario_run.update_cov_type(vegmap_json['conifers'], 4)
 
-        modelserver_run = scenario_run.run()
+        # close open netCDF
+        scenario_run.finalize_run()
 
-        scenario_run.end()
+        modelserver_run = scenario_run.run()
 
         updated_veg_map_by_hru = get_veg_map_by_hru(
             scenario_run.scenario_file
@@ -128,21 +133,27 @@ def scenarios():
 
         inputs = Inputs(control=control, parameter=parameter, data=data)
 
-        # TODO placeholder
         statsvar =\
             filter(lambda x: 'statsvar' == x.resource_type, resources
                    ).pop().resource_url
 
         outputs = Outputs(statsvar=statsvar)
 
-        # TODO placeholder
-        hydrograph = Hydrograph(
-            time_array=[datetime.datetime(2010, 10, 1, 0),
-                        datetime.datetime(2010, 10, 1, 1),
-                        datetime.datetime(2010, 10, 1, 2),
-                        datetime.datetime(2010, 10, 1, 3)],
-            streamflow_array=[24.4, 34.6, 10.0, 86.0]
-        )
+        if not os.path.isdir('.tmp'):
+            os.mkdir('.tmp')
+
+        tmp_statsvar = os.path.join('.tmp', 'statsvar-' + str(uuid4()))
+        urlretrieve(statsvar, tmp_statsvar)
+
+        d = netCDF4.Dataset(tmp_statsvar, 'r')
+        cfs = d['basin_cfs_1'][:]
+
+        t = d.variables['time']
+
+        # need to subtract 1...bug in generation of statsvar b/c t starts at 1
+        dates = netCDF4.num2date(t[:] - 1, t.units)
+
+        hydrograph = Hydrograph(time_array=dates, streamflow_array=cfs)
 
         new_scenario = Scenario(
             name=name,

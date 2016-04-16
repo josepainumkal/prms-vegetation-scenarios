@@ -49,14 +49,15 @@ class ScenarioRun:
 
         self.scenario_name = scenario_name
 
-    def end(self):
+    def finalize_run(self):
         '''
-        Close the working scenario and free our references to it
+        Finalize the updates to the param file and free our references to it
         :return:
         '''
         if self.working_scenario is None:
             return
         self.working_scenario.close()
+
         self.working_scenario = None
 
     def debug_display_cov_type(self, hru):
@@ -85,6 +86,7 @@ class ScenarioRun:
             return
 
         if hru != []:
+
             ctmat = self.working_scenario.variables['cov_type'][:]
             ctvec = ctmat.flatten()
             ctvec[hru] = val
@@ -106,8 +108,10 @@ class ScenarioRun:
         Returns:
             (client.swagger_client.models.model_run.ModelRun)
         """
-        if self.working_scenario is None:
-            raise Exception("No working scenario defined")
+        if self.working_scenario is not None:
+            raise Exception(
+                "Working Scenario is still being updated! `finalize_run` first"
+            )
             return
 
         auth_host = 'http://192.168.99.100:5005/api'
@@ -143,7 +147,7 @@ class ScenarioRun:
                 state != 'FINISHED' and
                 state != 'ERROR'
             )
-            time.sleep(0.5)
+            time.sleep(1)
 
         if state == 'ERROR':
             raise RuntimeError('Model server execution failed!')

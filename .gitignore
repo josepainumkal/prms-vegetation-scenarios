@@ -70,3 +70,4 @@ docs/main.aux
 docs/main.out
 docs/main.tex
 *.toc
+.tmp

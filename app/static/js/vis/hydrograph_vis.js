@@ -10,7 +10,7 @@ $(document).ready(function(){
 
 	// Load the Visualization API and the chart package.
 	google.charts.load('current', {'packages':['corechart']});
-	
+
 
 
 	// get data from /api/scenarios
@@ -76,7 +76,7 @@ $(document).ready(function(){
 					isDrawHydro[i] = true;
 					addDataIntoChart(i);
 				}
-	
+
 			}
 		}
 		// else remove it
@@ -89,7 +89,7 @@ $(document).ready(function(){
 				{
 					isDrawHydro[i] = false;
 				}
-	
+
 			}
 		}
 
@@ -130,7 +130,7 @@ $(document).ready(function(){
 			}
 		}
 	}
-	
+
 
 	function drawChart() {
 		var data = new google.visualization.DataTable();
@@ -147,7 +147,7 @@ $(document).ready(function(){
 
 			}
 		}
-		
+
 		// prepare data
 		var finalTuple = [];
 		var tempTuple;
