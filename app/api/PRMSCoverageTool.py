@@ -44,6 +44,11 @@ class ScenarioRun:
         else:
             self.scenario_file = "{0}.nc".format(scenario_name)
 
+        if not os.path.exists('.tmp'):
+            os.mkdir('.tmp')
+
+        self.scenario_file = os.path.join('.tmp', self.scenario_file)
+
         shutil.copyfile(self.basefile, self.scenario_file)
         self.working_scenario = netCDF4.Dataset(self.scenario_file, 'r+')
 
@@ -114,11 +119,6 @@ class ScenarioRun:
             )
             return
 
-        auth_host = 'http://192.168.99.100:5005/api'
-        model_host = 'http://192.168.99.100:5000/api'
-        app_username = 'maturner01@gmail.com'
-        app_password = 'ajajaj'
-
         cl = ModelApiClient(auth_host=auth_host, model_host=model_host)
         cl.authenticate_jwt(username=app_username, password=app_password)
 
@@ -137,6 +137,8 @@ class ScenarioRun:
         api.upload_resource_to_modelrun(
             mr.id, 'param', self.scenario_file
         )
+        # clean up scenario file after upload
+        os.remove(self.scenario_file)
 
         api.start_modelrun(mr.id)
 
