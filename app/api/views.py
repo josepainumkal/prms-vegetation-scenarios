@@ -116,15 +116,16 @@ def scenarios():
         new_scenario = Scenario(
             name=name,
             time_received=time_received,
+            veg_map_by_hru=get_veg_map_by_hru(scenario_run.scenario_file)
         )
 
         new_scenario.save()
 
-        modelserver_run = scenario_run.run()
-
-        # return value also contains
-        new_scenario.veg_map_by_hru = get_veg_map_by_hru(
-            scenario_run.scenario_file
+        modelserver_run = scenario_run.run(
+            auth_host=app.config['AUTH_HOST'],
+            model_host=app.config['MODEL_HOST'],
+            app_username=app.config['APP_USERNAME'],
+            app_password=app.config['APP_PASSWORD']
         )
 
         # TODO placeholder
@@ -169,15 +170,6 @@ def scenarios():
 
         hydrograph = Hydrograph(time_array=dates, streamflow_array=cfs)
         new_scenario.hydrograph = hydrograph
-        # new_scenario = Scenario(
-            # name=name,
-            # time_received=time_received,
-            # time_finished=time_finished,
-            # veg_map_by_hru=updated_veg_map_by_hru,
-            # inputs=inputs,
-            # outputs=outputs,
-            # hydrograph=hydrograph
-        # )
 
         new_scenario.save()
 

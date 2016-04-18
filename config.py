@@ -13,6 +13,9 @@ class Config:
     def init_app(app):
         pass
 
+    APP_USERNAME = os.getenv('APP_USERNAME', '')
+    APP_PASSWORD = os.getenv('APP_PASSWORD', '')
+
 
 class DevelopmentConfig(Config):
 
@@ -22,11 +25,11 @@ class DevelopmentConfig(Config):
 
     BASE_PARAMETER_NC = 'app/static/data/LC.param.nc'
 
-    VWMODELS_HOST =\
-        os.getenv('MODEL_HOST', default='http://192.168.99.100:5000')
+    MODEL_HOST =\
+        os.getenv('MODEL_HOST', default='http://192.168.99.100:5000/api')
 
     AUTH_HOST =\
-        os.getenv('AUTH_HOST', default='http://192.168.99.100:5005')
+        os.getenv('AUTH_HOST', default='http://192.168.99.100:5005/api')
 
 
 class TestingConfig(Config):
@@ -40,11 +43,11 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     PRODUCTION = True
 
-    VWMODELS_HOST = os.getenv(
+    MODEL_HOST = os.getenv(
         'MODEL_HOST', default='https://modelserver.virtualwatershed.org'
     )
 
-    VWMODELS_AUTH_HOST = os.getenv(
+    AUTH_HOST = os.getenv(
         'AUTH_HOST', default='https://auth.virtualwatershed.org'
     )
 

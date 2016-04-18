@@ -6,49 +6,82 @@ hydrologists wanting to investigate the effects of fire on the outputs of PRMS m
 
 ## Prototype Goals and Milestones (as of 2/25)
 
-There are [two current milestones](https://github.com/VirtualWatershed/prms-fire-scenarios/milestones):
+There is [one current milestone](https://github.com/VirtualWatershed/prms-fire-scenarios/milestones):
 
-1. [Minimum Viable Product due March 25](https://github.com/VirtualWatershed/prms-fire-scenarios/milestones/Minimum%20Viable%20Product%20--%20MVP)
 1. [v1.0 Release due May 13](https://github.com/VirtualWatershed/prms-fire-scenarios/milestones/v1.0%20Release)
 
-The [issues](https://github.com/VirtualWatershed/prms-fire-scenarios/issues) show what needs to be done. There
-are currently only issues for the first milestone, which will be the case for a while. These issues reference
-how to build out the wireframe demo (forthcoming).
+The [issues](https://github.com/VirtualWatershed/prms-fire-scenarios/issues)
+show what needs to be done.
 
 # Info and Getting Started
 
-Currently there are some demo routes in [app/api/views.py](https://github.com/VirtualWatershed/prms-fire-scenarios/blob/master/app/api/views.py)
-and the Swagger API spec is in [api-spec.yaml](https://github.com/VirtualWatershed/prms-fire-scenarios/blob/master/api-spec.yaml).
+## Installing and Launching Dockerized Auth/Modeling Server
 
-After installing dependencies (see below) you can start the python server with `python manage.py runserver` then navigate to
-[localhost:5000](http://localhost:5000) and you should see the screen below:
+The first step to getting started is to set up the development
+modeling and authorization server using Docker. You will need to install the
+[docker-toolkit](https://www.docker.com/products/docker-toolbox) no matter what
+OS you're working with.
 
-<img src="frontend_wireframe.png" alt="wireframe" width="500"/>
+Next, clone
+[vw-deploy](https://github.com/VirtualWatershed/vw-deploy), start a new docker
+machine, then create an account on the docker machine you started by visiting
+`ip-of-your-docker-machine:5005`.
 
+To get the ip of your docker machine, run `docker-machine ip vw-machine`.
+Probably it will be `196.168.99.100`. But it may not be, so be sure to check.
 
-#### Dependencies
+Here are the commands to get your docker machine (named `vw-machine`) going:
 
-There are a couple of things to do first. You must have Python, MongoDB, and
-the Javascript dependency manager [Bower](http://bower.io). For MongoDB, do a
-standard install with the server running on port 27017.
-Please do an internet search on how to install these for your particular system.
-After you have those installed, run
+```bash
+docker-machine create --driver virtualbox vw-machine
+```
+
+excluding `vw-machine` will create a machine called `default`.
+
+This starts the machine. You need to set this machine to be the environment
+you're working with. Running
+
+```bash
+docker-machine env vw-machine
+```
+
+will give you a message saying on how to configure your shell, as well as the
+environment variables that will be set when you execute the command. That
+command is
+
+```bash
+eval $(docker-machine env vw-machine)
+```
+
+Next, we need to bring up our docker container on the docker machine. The first
+time it runs, it will need to download and install some dependencies on the
+docker machine. This will not make any changes to your local file system.
+
+```bash
+cd vw-deploy/v1.0/development && docker-compose -f docker-compose.dev.yml up
+```
+
+When it's finished, navigate to
+[http://196.168.99.100:5005](http://196.168.99.100:5005) and create a
+development account. Unfortunately you'll have to create on every time you use
+the development system. But on the upside, it's easy to create a new development
+account. To "receive" your confirmation email, navigate to
+[http://196.168.99.100:1080](http://196.168.99.100:1080) to read your
+development emails.
+
+## Install Non-Dockerized Dependencies and Run the App
+
+Install Python dependencies using virtualenv
+
+```
+virtualenv venv && source venv/bin/activate && pip install -r requirements.txt
+```
+
+Next, install Javascript dependencies using [Bower](http://bower.io).
 
 ```
 bower install
 ```
-
-to install the Javascript dependencies.
-
-Next install the Python dependencies using
-
-```
-pip install -r requirements.txt
-```
-
-You probably want to be using
-[virtual environments](http://docs.python-guide.org/en/latest/dev/virtualenvs/),
-though this is not required.
 
 At this point bower has overwritten something in the repository. To put it back,
 
@@ -56,16 +89,13 @@ At this point bower has overwritten something in the repository. To put it back,
 git checkout -- app/static/bower_components/swagger-ui/dist/index.html
 ```
 
-## Running the App
+Now use gunicorn to start the server. We need multiple threads and this
+configuration seemed to be best.
 
-### Web interface
-
-We are close to our Minimum Viable Product release which includes a working
-version of a front-end web interface to the API. To start the development
-version of the system, simply run
-
-```
-python manage.py runserver
+```bash
+gunicorn --worker-class eventlet -w 4 manage:app -b 127.0.0.1:5000 \
+  --error-logfile='err.log' --access-logfile='log.log' --log-level DEBUG
+  -e APP_USERNAME='maturner01@gmail.com' -e APP_PASSWORD='ajajaj'
 ```
 
 If the MongoDB collection is empty (you haven't inserted any documents manually
@@ -81,6 +111,7 @@ you will see the list of current scenarios with one current scenario.
 
 API routes are in
 [app/api/views.py](https://github.com/VirtualWatershed/prms-fire-scenarios/blob/master/app/api/views.py).
+
 
 
 ### Run Swagger-UI to see spec
