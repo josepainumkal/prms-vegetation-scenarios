@@ -15,7 +15,7 @@ from urllib import urlretrieve
 from uuid import uuid4
 
 from . import api
-from ..models import Scenario, Hydrograph, Inputs, Outputs
+from ..models import Scenario, Hydrograph, Inputs, Outputs, VegetationMapByHRU
 from util import get_veg_map_by_hru
 from PRMSCoverageTool import ScenarioRun
 
@@ -42,26 +42,24 @@ def scenario_by_id(scenario_id):
 
     if request.method == 'DELETE':
 
-        scenario = Scenario.objects(id=scenario_id).first()
+        try:
+            scenario = Scenario.get(id=scenario_id)
 
-        if scenario:
+            scenario.delete()
 
-            try:
-                scenario.delete()
-                return jsonify(
-                    message='scenario with id ' + scenario_id + ' removed!'
-                )
+            return jsonify(
+                message='scenario with id ' + scenario_id + ' removed!'
+            )
 
-            except:
-                return Response(
-                    json.dumps(
-                        {'message': 'error deleting scenario ' + scenario_id}
+        except:
+            return Response(
+                json.dumps(
+                    {'message': 'error deleting scenario ' + scenario_id}
 
-                    ), 400, mimetype='application/json'
-                )
+                ), 400, mimetype='application/json'
+            )
 
         else:
-
             return Response(
                 json.dumps(
                     {'message': 'scenario_id' + scenario_id + 'not found'}
@@ -98,6 +96,9 @@ def scenarios():
 
         time_received = datetime.datetime.now()
 
+        # this gets confusing, but the scenario_run is for configuring and
+        # running the model and the new_scenario is the Mongo record.
+        # Before pushing this needs to be all-in-one
         scenario_run = ScenarioRun(BASE_PARAMETER_NC)
         scenario_run.initialize(name)
 
@@ -110,14 +111,23 @@ def scenarios():
         # close open netCDF
         scenario_run.finalize_run()
 
+        new_scenario = Scenario(
+            name=name,
+            time_received=time_received,
+        )
+
+        new_scenario.save()
+        import ipdb; ipdb.set_trace()
         modelserver_run = scenario_run.run()
 
-        updated_veg_map_by_hru = get_veg_map_by_hru(
+        # return value also contains
+        new_scenario.veg_map_by_hru = get_veg_map_by_hru(
             scenario_run.scenario_file
         )
 
         # TODO placeholder
         time_finished = datetime.datetime.now()
+        new_scenario.time_finished = time_finished
 
         resources = modelserver_run.resources
 
@@ -132,12 +142,14 @@ def scenarios():
                    ).pop().resource_url
 
         inputs = Inputs(control=control, parameter=parameter, data=data)
+        new_scenario.inputs = inputs
 
         statsvar =\
             filter(lambda x: 'statsvar' == x.resource_type, resources
                    ).pop().resource_url
 
         outputs = Outputs(statsvar=statsvar)
+        new_scenario.outputs = outputs
 
         if not os.path.isdir('.tmp'):
             os.mkdir('.tmp')
@@ -154,18 +166,22 @@ def scenarios():
         dates = netCDF4.num2date(t[:] - 1, t.units)
 
         hydrograph = Hydrograph(time_array=dates, streamflow_array=cfs)
-
-        new_scenario = Scenario(
-            name=name,
-            time_received=time_received,
-            time_finished=time_finished,
-            veg_map_by_hru=updated_veg_map_by_hru,
-            inputs=inputs,
-            outputs=outputs,
-            hydrograph=hydrograph
-        )
+        new_scenario.hydrograph = hydrograph
+        # new_scenario = Scenario(
+            # name=name,
+            # time_received=time_received,
+            # time_finished=time_finished,
+            # veg_map_by_hru=updated_veg_map_by_hru,
+            # inputs=inputs,
+            # outputs=outputs,
+            # hydrograph=hydrograph
+        # )
 
         new_scenario.save()
+
+        # clean up temporary statsvar netCDF
+        d.close()
+        os.remove(tmp_statsvar)
 
         return jsonify(scenario=new_scenario.to_json())
 
@@ -178,7 +194,7 @@ def hru_veg_json():
         BASE_PARAMETER_NC = app.config['BASE_PARAMETER_NC']
 
         return jsonify(
-            get_veg_map_by_hru(BASE_PARAMETER_NC)
+            **json.loads(get_veg_map_by_hru(BASE_PARAMETER_NC).to_json())
         )
 
 

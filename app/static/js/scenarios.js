@@ -59,19 +59,23 @@ var ScenarioList = React.createClass({
         }
 
         var tableRows = this.props.data.scenarios.map(function(scenario) {
-
             return (
                 <tr key={scenario._id.$oid}>
                     <td>{scenario.name}</td>
                     <td>{new Date(scenario.time_received.$date).toISOString().slice(0,19)}</td>
-                    <td>{new Date(scenario.time_finished.$date).toISOString().slice(0,19)}</td>
+                    <td>{
+                           scenario.time_finished ?
+                           new Date(scenario.time_finished.$date).toISOString().slice(0,19) :
+                           "Pending"
+                        }
+                    </td>
                     <td>
                         <a href={scenario.inputs ? scenario.inputs.parameter : '#'}>
                             Download Input Parameters
                         </a>
                     </td>
                     <td>
-                    <a href={scenario.outputs ? scenario.outputs.statvar : '#'}>
+                    <a href={scenario.outputs ? scenario.outputs.statsvar : '#'}>
                             Download Output Data
                         </a>
                     </td>
@@ -80,6 +84,7 @@ var ScenarioList = React.createClass({
                           View Hydrograph
                         </a>
                     </td>
+                    <td><div className="delete-scenario"><span className="glyphicon glyphicon-trash"></span></div></td>
                 </tr>
             );
         });
@@ -95,6 +100,7 @@ var ScenarioList = React.createClass({
                             <td><strong>Download Inputs</strong></td>
                             <td><strong>Download Outputs</strong></td>
                             <td className="download-link"><strong>View Hydrograph</strong></td>
+                            <td>Delete Scenario</td>
                         </tr>
                     </thead>
                     <tbody>

@@ -20,6 +20,13 @@
 {% block head_ext %}
     {{ super() }}
     <style>
+      .delete-scenario {
+        vertical-align: middle;
+        text-align: center;
+      }
+      .delete-scenario span {
+        line-height: 100px;
+      }
     #map {
       width: 90%;
       height: 350px;
@@ -229,7 +236,7 @@
 
 <script type="text/babel">
 ReactDOM.render(
-    <ScenarioListBox pollInterval={2000} />,
+    <ScenarioListBox pollInterval={1000} />,
     document.getElementById('scenario-list')
 );
 </script>

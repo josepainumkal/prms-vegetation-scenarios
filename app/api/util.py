@@ -74,7 +74,8 @@ def get_veg_map_by_hru(prms_params_file):
         projection_information=projection_information
     )
 
-    ret = json.loads(vegmap.to_json())
-    ret['elevation'] = prms_params.variables['hru_elev'][:].flatten().tolist()
+    # ret = json.loads(vegmap.to_json())
+    # ret['elevation'] = prms_params.variables['hru_elev'][:].flatten().tolist()
+    vegmap.elevation = prms_params.variables['hru_elev'][:].flatten().tolist()
 
-    return ret
+    return vegmap

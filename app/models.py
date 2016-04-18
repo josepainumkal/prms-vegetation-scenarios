@@ -61,7 +61,7 @@ class Scenario(db.Document):
     user = db.StringField(default='anonymous')
 
     time_received = db.DateTimeField(required=True)
-    time_finished = db.DateTimeField(required=True)
+    time_finished = db.DateTimeField()
 
     veg_map_by_hru = db.EmbeddedDocumentField('VegetationMapByHRU')
 
