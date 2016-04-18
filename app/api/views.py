@@ -42,24 +42,26 @@ def scenario_by_id(scenario_id):
 
     if request.method == 'DELETE':
 
-        try:
-            scenario = Scenario.get(id=scenario_id)
+        scenario = Scenario.objects(id=scenario_id).first()
 
-            scenario.delete()
+        if scenario:
 
-            return jsonify(
-                message='scenario with id ' + scenario_id + ' removed!'
-            )
+            try:
+                scenario.delete()
+                return jsonify(
+                    message='scenario with id ' + scenario_id + ' removed!'
+                )
 
-        except:
-            return Response(
-                json.dumps(
-                    {'message': 'error deleting scenario ' + scenario_id}
+            except:
+                return Response(
+                    json.dumps(
+                        {'message': 'error deleting scenario ' + scenario_id}
 
-                ), 400, mimetype='application/json'
-            )
+                    ), 400, mimetype='application/json'
+                )
 
         else:
+
             return Response(
                 json.dumps(
                     {'message': 'scenario_id' + scenario_id + 'not found'}
@@ -117,7 +119,7 @@ def scenarios():
         )
 
         new_scenario.save()
-        import ipdb; ipdb.set_trace()
+
         modelserver_run = scenario_run.run()
 
         # return value also contains

@@ -58,6 +58,13 @@ var ScenarioList = React.createClass({
             window.open(hydrographURL, 'newwindow', 'width=900,height=1100');
         }
 
+        var deleteScenario = function(sc) {
+          $.ajax({
+              method: 'DELETE',
+              url: '/api/scenarios/' + sc._id.$oid
+          });
+        }
+
         var tableRows = this.props.data.scenarios.map(function(scenario) {
             return (
                 <tr key={scenario._id.$oid}>
@@ -84,7 +91,13 @@ var ScenarioList = React.createClass({
                           View Hydrograph
                         </a>
                     </td>
-                    <td><div className="delete-scenario"><span className="glyphicon glyphicon-trash"></span></div></td>
+                    <td>
+                      <div className="delete-scenario" id={"delete-"+scenario._id.$oid}>
+                        <span className="glyphicon glyphicon-trash"
+                              onClick={deleteScenario.bind(this, scenario)}>
+                        </span>
+                      </div>
+                    </td>
                 </tr>
             );
         });
@@ -100,7 +113,7 @@ var ScenarioList = React.createClass({
                             <td><strong>Download Inputs</strong></td>
                             <td><strong>Download Outputs</strong></td>
                             <td className="download-link"><strong>View Hydrograph</strong></td>
-                            <td>Delete Scenario</td>
+                            <td><strong>Delete Scenario</strong></td>
                         </tr>
                     </thead>
                     <tbody>
@@ -125,20 +138,28 @@ window.ScenarioListBox = ScenarioListBox;
     page reloads for better UX.
 **/
 var vegChangeIdx = 0;
-
 $('#save-veg-update').click(function(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    $('#veg-update-list')
-        .append('<h4 id="veg-change-' + vegChangeIdx + '">'
-                    + 'Yeah added a change to the veg map' +
-                        '  <a class="remove-veg-update">x</a>' +
-                '</h4>'
-        );
+  $('#veg-update-list')
+      .append('<h4 id="veg-change-' + vegChangeIdx + '">'
+                  + 'Yeah added a change to the veg map' +
+                      '  <a class="remove-veg-update">x</a>' +
+              '</h4>'
+      );
 
-    vegChangeIdx++;
+  vegChangeIdx++;
 });
 
 $('#veg-update-list').on('click', 'a.remove-veg-update', function(e) {
-    $(e.toElement.parentElement).remove();
+  $(e.toElement.parentElement).remove();
+});
+
+$('.delete-scenario').click(function(e) {
+  var scenarioId = e.attr('id').replace('delete-', '');
+  debugger;
+  $.ajax({
+      type: 'DELETE',
+      url: '/api/scenarios/' + scenarioId
+  });
 });
