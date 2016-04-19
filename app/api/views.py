@@ -1,5 +1,5 @@
 """
-PRMS Fire Modeling API
+PRMS Vegetation Change Modeling API
 
 Date: Feb 25 2016
 """
@@ -15,7 +15,7 @@ from urllib import urlretrieve
 from uuid import uuid4
 
 from . import api
-from ..models import Scenario, Hydrograph, Inputs, Outputs, VegetationMapByHRU
+from ..models import Scenario, Hydrograph, Inputs, Outputs
 from util import get_veg_map_by_hru
 from PRMSCoverageTool import ScenarioRun
 
@@ -98,9 +98,11 @@ def scenarios():
 
         time_received = datetime.datetime.now()
 
+        # XXX FIXME XXX
         # this gets confusing, but the scenario_run is for configuring and
         # running the model and the new_scenario is the Mongo record.
-        # Before pushing this needs to be all-in-one
+        # Issue #35
+        # https://github.com/VirtualWatershed/prms-vegetation-scenarios/issues/35
         scenario_run = ScenarioRun(BASE_PARAMETER_NC)
         scenario_run.initialize(name)
 
