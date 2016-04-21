@@ -1,9 +1,14 @@
 import json
 import netCDF4
+import shutil
+
 
 from numpy import where
 
 from ..models import VegetationMapByHRU, ProjectionInformation
+
+from client.model_client.client import ModelApiClient
+from client.swagger_client.apis.default_api import DefaultApi
 
 LEHMAN_CREEK_CELLSIZE = 100  # in meters; should be in netCDF, but it's not
 
@@ -79,3 +84,27 @@ def get_veg_map_by_hru(prms_params_file):
     vegmap.elevation = prms_params.variables['hru_elev'][:].flatten().tolist()
 
     return vegmap
+
+def model_run_name(auth_host=None, model_host=None,
+        app_username=None, app_password=None):
+    """
+    the function is used to collect model run names
+    """ 
+
+    cl = ModelApiClient(auth_host=auth_host, model_host=model_host)
+    cl.authenticate_jwt(username=app_username, password=app_password)
+
+    api = DefaultApi(api_client=cl)
+
+    # record all the model runs 
+    model_run = api.search_modelruns().objects
+
+    temp_list = [0] * len(model_run)
+
+    for loop_count in range(len(temp_list)):
+        temp_item = model_run[loop_count]
+        # for current version, we only display finished model run
+        if temp_item['progress_state'] =='FINISHED':
+            temp_list[loop_count] = {'id':temp_item['id']}
+
+    return json.dumps(temp_list)

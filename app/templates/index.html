@@ -9,7 +9,8 @@
     <script type="text/javascript" src='/static/bower_components/html2canvas/build/html2canvas.min.js' type='text/javascript'></script>
     <!-- THIS JS IS an AWESOME COLOR LIB -->
     <script type="text/javascript" src="/static/bower_components/chroma-js/chroma.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBINKUFZugKXNT1ieZy315WFViufQUZvv4"
+    async defer></script>
     <script type="text/javascript" src="/static/js/vis/overlay_google_map.js"></script>
     <!-- THIS JS IS USED FOR 2D map polygon -->
     <script type="text/javascript" src="/static/js/vis/draw_polygon_on_map.js"></script>
@@ -194,7 +195,8 @@
     </div>
 
 
-    <h4>4. Enter a scenario name</h4>
+    <h4>4. Enter a scenario</h4>
+
     <div class="row" 
             id="new-scenario-menu" align="center">
         <div style="width:70%" align="left">
@@ -240,7 +242,7 @@
 
 <script type="text/babel">
 ReactDOM.render(
-    <ScenarioListBox pollInterval={1000} />,
+    <ScenarioListBox pollInterval={5000} />,
     document.getElementById('scenario-list')
 );
 </script>

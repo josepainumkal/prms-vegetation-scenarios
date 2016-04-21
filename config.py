@@ -15,13 +15,16 @@ class Config:
 
     APP_USERNAME = os.getenv('APP_USERNAME', '')
     APP_PASSWORD = os.getenv('APP_PASSWORD', '')
+    # MONGODB_HOST = os.getenv('MONGODB_HOST', 'mongo')
+    # MONGODB_DB = os.getenv('MONGODB_DB', 'scenarios')
+    # MONGODB_PORT = os.getenv('MONGODB_PORT', 27017)
 
 
 class DevelopmentConfig(Config):
 
     DEBUG = True
 
-    MONGODB_SETTINGS = {'db': 'scenarios'}
+    MONGODB_SETTINGS = {'db': 'scenarios','host':'mongo'}
 
     BASE_PARAMETER_NC = 'app/static/data/LC.param.nc'
 

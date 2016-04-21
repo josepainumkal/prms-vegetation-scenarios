@@ -157,6 +157,7 @@ class ScenarioRun:
         return api.get_modelrun_by_id(mr.id)
 
 
+
 if __name__ == "__main__":
     prmsfile = ScenarioRun("parameter.nc")
 

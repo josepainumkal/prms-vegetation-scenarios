@@ -50,8 +50,10 @@ ENV APP_USERNAME abc@xyz.com
 ENV APP_PORT 5000
 ENV APP_PASSWORD prms
 
-CMD gunicorn --worker-class eventlet -w 4 manage:app -b 0.0.0.0:${APP_PORT} \
- --error-logfile='err.log' --access-logfile='log.log' --log-level DEBUG -e \
- APP_USERNAME=${APP_USERNAME} -e APP_PASSWORD=${APP_PASSWORD}
+#CMD gunicorn --worker-class eventlet -w 4 manage:app -b 0.0.0.0:${APP_PORT} \
+# --error-logfile='err.log' --access-logfile='log.log' --log-level DEBUG -e \
+# APP_USERNAME=${APP_USERNAME} -e APP_PASSWORD=${APP_PASSWORD}
+
+CMD python manage.py runserver -h 0.0.0.0 -p ${APP_PORT} --threaded
 
 #CMD ./serve-swag.sh

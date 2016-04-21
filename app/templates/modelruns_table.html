@@ -1,0 +1,68 @@
+<!-- Home page for our human adaptor -->
+{% extends "base.html" %}
+{% set active_page = "index" %}
+{% block scripts %}
+    {{ super() }}
+    <script type="text/babel" src="/static/js/scenarios.js"></script>
+    <script type="text/javascript" src="/static/js/model_run_table.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+{% endblock %}
+
+{% block head_ext %}
+    {{ super() }}
+    <style>
+      .delete-scenario {
+        vertical-align: middle;
+        text-align: center;
+        border-width: 1px;
+      }
+      .delete-scenario:hover {
+        cursor: pointer;
+      }
+      .delete-scenario span {
+        line-height: 20px;
+      }
+    #new-scenario-menu-content {
+      position: relative;
+    }
+    #scenario-list {
+      display: table;
+    }
+    .section-header {
+      text-decoration: underline;
+    }
+    .btn-custom {
+      border-color: #dfd7ca;
+      border-width: 2px;
+      border-style: solid;
+    }
+    .btn-custom.active {
+      background-color: #f8f5f0;
+    }
+    .btn-custom:hover {
+      background-color: #f8f5f0;
+      color: #3e3f3a;
+    }
+    .btn {
+      margin: 3.5px;
+    }
+
+    td.download-link>a:hover {
+      cursor: pointer;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="row">
+        <h3 class="section-header">List of Completed Scenarios</h3>
+        <div id="scenario-list"></div>
+    </div>
+
+
+</div>
+
+
+{% endblock %}

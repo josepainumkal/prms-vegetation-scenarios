@@ -16,7 +16,7 @@ from uuid import uuid4
 
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
-from util import get_veg_map_by_hru
+from util import get_veg_map_by_hru, model_run_name
 from PRMSCoverageTool import ScenarioRun
 
 
@@ -68,6 +68,15 @@ def scenario_by_id(scenario_id):
                 ), 400, mimetype='application/json'
             )
 
+@api.route('/api/scenarios/finished_modelruns')
+def display_modelruns():
+    temp_list = model_run_name(
+            auth_host=app.config['AUTH_HOST'],
+            model_host=app.config['MODEL_HOST'],
+            app_username=app.config['APP_USERNAME'],
+            app_password=app.config['APP_PASSWORD']
+        )
+    return temp_list
 
 @api.route('/api/scenarios', methods=['GET', 'POST'])
 def scenarios():

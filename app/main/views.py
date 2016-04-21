@@ -4,11 +4,16 @@ from flask import render_template
 from . import main
 
 
+
 @main.route('/')
 def index():
     """Help page"""
 
     return render_template('index.html')
+
+@main.route('/modelruns_table')
+def show_all_modelruns():
+	return render_template('modelruns_table.html')
 
 @main.route('/hydrograph_vis/<scenario_id>')
 def hydrograph_visualization(scenario_id = ''):
