@@ -15,6 +15,9 @@ $(document).ready(function(){
   // current veg code
   var vegCurrent;
 
+ // elevation information for all HRU cells
+  var elevationInfo;
+
   var canvasWidth;
   var canvasHeight;
   var canvasHandle;
@@ -67,6 +70,15 @@ $(document).ready(function(){
     dataY = inputJson['projection_information']['nrow'];
 
     vegOrigin = obtainJsoninto1D(inputJson);
+
+    elevationInfo = inputJson['elevation'].slice();
+    var minElevation = elevationInfo.min();
+    var maxElevation = elevationInfo.max();
+    // append input area and instruction
+    // this part should be dynamically generated
+    $("#elevationInputID").append("<p>The elevation scale is from "+minElevation.toString()+" to "+maxElevation.toString()+"</p>");
+    $("#elevationInputID").append("<input type='number' min='"+minElevation.toString()+"' max='"+maxElevation.toString()+"' step='0.1' id='elevationSelectorID'>");
+    $("#elevationInputID").append("<input type='button' class='btn btn-sm btn-sm-map' id='confirmElevationButton' value='Update Map by Elevation' />");
 
     // should not use var vegCurrent = vegOrigin
     // coz when we change vegCurrent and then vegOrigin will change too
@@ -146,6 +158,15 @@ $(document).ready(function(){
             //parseInt($('input[name="vegcode-select"]:checked').val());
       chosenAreaInfo.push({colorNum:colorOptNum,chosenArea:chosenHRU});
       chosenHRU=[];
+    });
+
+    $('#confirmElevationButton').click(function(){
+      changeVegByElevation(vegCurrent, elevationInfo, dataX, dataY);
+
+      resetCanvas(vegCurrent);
+
+      // update map overlay
+      updateMapOverlay();
     });
 
 
@@ -253,6 +274,8 @@ $(document).ready(function(){
   // this function grab data json input and create a 1D array of hru values
   function obtainJsoninto1D(inputJson)
   {
+    var totalHRUNum = 0;
+
     var outputArr = new Array(dataX*dataY);
     // for this case veg_code is the loop count (from 0), vegCode is str
     // therefore veg_code = i.toString()
@@ -260,6 +283,9 @@ $(document).ready(function(){
     $.each(['bare_ground', 'grasses', 'shrubs', 'trees', 'conifers'],
       function(i, cov_type) {
         tempSize = inputJson[cov_type].length;
+
+        totalHRUNum = totalHRUNum + tempSize;
+
         for(var m=0; m<tempSize; m++ )
         {
           outputArr[inputJson[cov_type][m]] = i;
@@ -267,7 +293,18 @@ $(document).ready(function(){
       }
     );
 
-    return outputArr;
+    // test if the inputJson is valid
+    if(totalHRUNum == dataX*dataY)
+    {
+      return outputArr;  
+    }
+    else
+    {
+      console.log('Data from the get request is not right.');
+      console.log('HRU number is not consistent.');
+      return [];
+    }
+
   }
 
   // this is from http://www.html5canvastutorials.com/advanced/html5-canvas-mouse-coordinates/
@@ -405,6 +442,34 @@ $(document).ready(function(){
 
     }
 
+  }
+
+  Array.prototype.max = function() {
+    return Math.max.apply(null, this);
+  };
+
+  Array.prototype.min = function() {
+    return Math.min.apply(null, this);
+  };
+
+  function changeVegByElevation(inputHRU, inputElevationInfo, inputArrX, inputArrY)
+  {
+    var hruNum = 0;
+    var elevationThreshold = $('#elevationSelectorID').val();
+    // get the current chosen color number
+    var colorOptNum = parseInt($('#vegetation-type-selector label.active input').val());
+
+    for(var m=0 ; m<inputArrY ; m++)
+    {
+      for(var i=0 ; i<inputArrX ; i++)
+      {
+        hruNum = i + m*dataX;
+        if(inputElevationInfo[hruNum] >= elevationThreshold)
+        {
+          inputHRU[hruNum] = colorOptNum;
+        }
+      }
+    }
   }
 
 
