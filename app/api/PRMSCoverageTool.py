@@ -6,6 +6,7 @@ import os
 import time
 
 from numpy import reshape
+from flask import current_app as app
 
 from client.model_client.client import ModelApiClient
 from client.swagger_client.apis.default_api import DefaultApi
@@ -32,6 +33,13 @@ class ScenarioRun:
             .nc will be appended
         :return:
         '''
+        username = app.config['APP_USERNAME']
+        # get the first part of username as part of the final file name
+        username_part = username.split('.')[0]
+        app_root = os.path.dirname(os.path.abspath(__file__))
+        app_root = app_root + '/../static/user_data/'
+        app.logger.debug(app_root) 
+
         if self.working_scenario is not None:
             raise Exception("Working Scenario already open")
             return
@@ -44,10 +52,15 @@ class ScenarioRun:
         else:
             self.scenario_file = "{0}.nc".format(scenario_name)
 
-        if not os.path.exists('.tmp'):
-            os.mkdir('.tmp')
+        if not os.path.exists(app_root):
+            os.mkdir(app_root)
 
-        self.scenario_file = os.path.join('.tmp', self.scenario_file)
+        # TODO too confusing this part does not create a new file based on username
+        self.scenario_file = username_part+'.nc'
+        self.scenario_file = os.path.join(app_root, self.scenario_file)
+
+        app.logger.debug(self.scenario_file) 
+        app.logger.debug(self.basefile) 
 
         shutil.copyfile(self.basefile, self.scenario_file)
         self.working_scenario = netCDF4.Dataset(self.scenario_file, 'r+')

@@ -1,11 +1,15 @@
 import json
 import netCDF4
 import shutil
+import urllib
+import os
 
 
 from numpy import where
 
 from ..models import VegetationMapByHRU, ProjectionInformation
+
+from flask import current_app as app
 
 from client.model_client.client import ModelApiClient
 from client.swagger_client.apis.default_api import DefaultApi
@@ -85,6 +89,7 @@ def get_veg_map_by_hru(prms_params_file):
 
     return vegmap
 
+
 def model_run_name(auth_host=None, model_host=None,
         app_username=None, app_password=None):
     """
@@ -108,3 +113,29 @@ def model_run_name(auth_host=None, model_host=None,
             temp_list[loop_count] = {'id':temp_item['id']}
 
     return json.dumps(temp_list)
+
+def find_user_folder():
+    username = app.config['APP_USERNAME']
+    # get the first part of username as part of the final file name
+    username_part = username.split('.')[0]
+    app_root = os.path.dirname(os.path.abspath(__file__))
+    app_root = app_root + '/../static/user_data/' + username_part
+    return app_root
+
+def download_prms_inputs(control_url,data_url,param_url):
+    app_root = find_user_folder()
+
+    if not os.path.exists(app_root):
+        os.mkdir(app_root)
+
+    control_file = app_root + '/temp_control.control'
+    data_file = app_root + '/temp_data.nc'
+    param_file = app_root + '/temp_param.nc'
+
+    app.logger.debug(control_file) 
+    # download three inputs file based on the urls
+    urllib.urlretrieve(control_url, control_file)
+    urllib.urlretrieve(data_url, data_file)
+    urllib.urlretrieve(param_url, param_file)
+
+

@@ -203,7 +203,7 @@ $(document).ready(function(){
       var scenarioName = $('#scenario-name-input').val();
       $.ajax({
           type : "POST",
-          url : "/api/scenarios",
+          url : "/api/scenarios/test",
           //url : "/api/scenarios",
           //data: JSON.stringify(inputJson, null, '\t'),
           data: JSON.stringify(
