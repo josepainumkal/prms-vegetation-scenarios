@@ -137,5 +137,6 @@ def download_prms_inputs(control_url,data_url,param_url):
     urllib.urlretrieve(control_url, control_file)
     urllib.urlretrieve(data_url, data_file)
     urllib.urlretrieve(param_url, param_file)
+    app.logger.debug('User: '+app.config['APP_USERNAME']+' finished downloading three input files') 
 
 

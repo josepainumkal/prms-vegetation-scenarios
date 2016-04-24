@@ -82,14 +82,20 @@ def display_modelruns():
 # this part handles the chosen three prms inputs
 # post is for send the file meta data such as url
 # get is for return the file info
-@api.route('/api/scenarios/download_input_files', methods=['GET', 'POST'])
+@api.route('/api/scenarios/download_input_files', methods=['GET','POST'])
 def download_model_inputs():
+    # control_url = request.json['model_run'][0]['control_url']
+    # data_url = request.json['model_run'][0]['data_url']
+    # param_url = request.json['model_run'][0]['param_url']
+    # # use the following function to download the three input files
+    # download_prms_inputs(control_url, data_url, param_url)
     if request.method == 'POST':
         control_url = request.json['model_run'][0]['control_url']
         data_url = request.json['model_run'][0]['data_url']
         param_url = request.json['model_run'][0]['param_url']
         # use the following function to download the three input files
         download_prms_inputs(control_url, data_url, param_url)
+        return 'success'
     elif request.method == 'GET':
         return
     

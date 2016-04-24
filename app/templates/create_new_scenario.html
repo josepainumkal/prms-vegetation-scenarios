@@ -13,7 +13,7 @@
     async defer></script>
     <script type="text/javascript" src="/static/js/vis/overlay_google_map.js"></script>
     <!-- THIS JS IS USED FOR 2D map polygon -->
-    <script type="text/javascript" src="/static/js/vis/draw_polygon_on_map.js"></script>
+    <!-- <script type="text/javascript" src="/static/js/vis/draw_polygon_on_map.js"></script> -->
 {% endblock %}
 {% block link %}
     {{ super() }}
@@ -116,6 +116,12 @@
     td.download-link>a:hover {
       cursor: pointer;
     }
+    .metaData {
+      visibility: hidden;
+    }
+    #model-modifier-div-id {
+      visibility: hidden;
+    }
     </style>
 {% endblock %}
 
@@ -153,7 +159,7 @@
         <div id='step-2-title-id'></div>
         <div id='step-2-content-id'></div>
 
-        <div>
+        <div id='model-modifier-div-id'>
            <div class="row">
                 <h2>Instructions</h2>
                 <p>

@@ -71,7 +71,6 @@ $(document).ready(function(){
 	            return (
 	                <tr key={scenario._id.$oid}>
 	                    <td>{scenario.name}</td>
-	                    <td>{new Date(scenario.time_received.$date).toISOString().slice(0,19)}</td>
 	                    <td>{
 	                           scenario.time_finished ?
 	                           new Date(scenario.time_finished.$date).toISOString().slice(0,19) :
@@ -112,7 +111,6 @@ $(document).ready(function(){
 	                    <thead>
 	                        <tr>
 	                            <td><strong>Scenario Name</strong></td>
-	                            <td><strong>Time Received</strong></td>
 	                            <td><strong>Time Finished</strong></td>
 	                            <td className="download-link"><strong>View Hydrograph</strong></td>
 	                            <td className="download-link"><strong>Display Scenario Resources & Modified Veg</strong></td>
