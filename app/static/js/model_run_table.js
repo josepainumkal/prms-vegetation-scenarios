@@ -164,9 +164,6 @@ $(document).ready(function(){
 			}
 		}
 
-		var jsonStr =	'{ "model_run" : [' +
-							'{ "control_url":"'+controlURL+'" , "data_url":"'+dataURL+'", "param_url":"'+paramURL+'" }' +
-						']}';
 		// need to replace all the / with +++ in the url
 		// or it will distract flask server
 		controlURL = controlURL.replace(/\//g,'+++');
