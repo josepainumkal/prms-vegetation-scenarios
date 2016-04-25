@@ -51,9 +51,7 @@ class ScenarioRun:
             os.mkdir('.tmp')
 
         self.scenario_file = os.path.join('.tmp', self.scenario_file)
-        app.logger.debug('aaaaaaaaaaa')
-        app.logger.debug(self.scenario_file)
-
+        
         shutil.copyfile(self.basefile, self.scenario_file)
         self.working_scenario = netCDF4.Dataset(self.scenario_file, 'r+')
 

@@ -55,7 +55,7 @@ var ScenarioList = React.createClass({
 
         var displayHydrograph = function(tempScenario) {
             var hydrographURL = '/hydrograph_vis/'+tempScenario._id.$oid;
-            window.open(hydrographURL, 'newwindow', 'width=900,height=1100');
+            window.open(hydrographURL, 'newwindow', 'width=900,height=1200');
         }
 
         var deleteScenario = function(sc) {
