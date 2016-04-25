@@ -82,22 +82,42 @@ def display_modelruns():
 # this part handles the chosen three prms inputs
 # post is for send the file meta data such as url
 # get is for return the file info
-@api.route('/api/scenarios/download_input_files', methods=['GET','POST'])
-def download_model_inputs():
-    # control_url = request.json['model_run'][0]['control_url']
-    # data_url = request.json['model_run'][0]['data_url']
-    # param_url = request.json['model_run'][0]['param_url']
-    # # use the following function to download the three input files
-    # download_prms_inputs(control_url, data_url, param_url)
-    if request.method == 'POST':
-        control_url = request.json['model_run'][0]['control_url']
-        data_url = request.json['model_run'][0]['data_url']
-        param_url = request.json['model_run'][0]['param_url']
-        # use the following function to download the three input files
-        download_prms_inputs(control_url, data_url, param_url)
-        return 'success'
-    elif request.method == 'GET':
-        return
+# the url_info used this format: control_url---data_url---param_url
+@api.route('/api/scenarios/download_input_files/<url_info>')
+def download_model_inputs(url_info):
+    url_list = url_info.split('---')
+    control_url = url_list[0].replace('+++','/')
+    app.logger.debug(control_url)
+    data_url = url_list[1].replace('+++','/')
+    app.logger.debug(data_url)
+    param_url = url_list[2].replace('+++','/')
+    app.logger.debug(param_url)
+    # use the following function to download the three input files
+    download_prms_inputs(control_url, data_url, param_url)
+    return 'success'
+# @api.route('/api/scenarios/download_input_files', methods=['GET','POST'])
+# def download_model_inputs():
+#     # control_url = request.json['model_run'][0]['control_url']
+#     # data_url = request.json['model_run'][0]['data_url']
+#     # param_url = request.json['model_run'][0]['param_url']
+#     # # use the following function to download the three input files
+#     # download_prms_inputs(control_url, data_url, param_url)
+#     if request.method == 'POST':
+#         control_url = request.json['model_run'][0]['control_url']
+#         data_url = request.json['model_run'][0]['data_url']
+#         param_url = request.json['model_run'][0]['param_url']
+#         # use the following function to download the three input files
+#         download_prms_inputs(control_url, data_url, param_url)
+#         return 'success'
+#     elif request.method == 'GET':
+#         app.logger.debug('hello')
+#         control_url = request.json['model_run'][0]['control_url']
+#         app.logger.debug(control_url)
+#         data_url = request.json['model_run'][0]['data_url']
+#         param_url = request.json['model_run'][0]['param_url']
+#         # use the following function to download the three input files
+#         download_prms_inputs(control_url, data_url, param_url)
+#         return 'success'
     
 
 @api.route('/api/scenarios', methods=['GET', 'POST'])

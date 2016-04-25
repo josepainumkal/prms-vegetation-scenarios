@@ -166,19 +166,16 @@ $(document).ready(function(){
 		var jsonStr =	'{ "model_run" : [' +
 							'{ "control_url":"'+controlURL+'" , "data_url":"'+dataURL+'", "param_url":"'+paramURL+'" }' +
 						']}';
-		var metaJSON = JSON.parse(jsonStr);
-
-		// send the meta data to server to download the files
-		// $.get( "/api/scenarios/download_input_files", 
-		// 	   { control_url: controlURL, data_url: dataURL, param_url: paramURL }, function(data){
-		// 	var a = 0;
-		// });
+		// need to replace all the / with +++ in the url
+		// or it will distract flask server
+		controlURL = controlURL.replace(/\//g,'+++');
+		dataURL = dataURL.replace(/\//g,'+++');
+		paramURL = paramURL.replace(/\//g,'+++');
+		// separate url by ---
+		var url_info = controlURL + '---' + dataURL + '---' + paramURL;
         $.ajax({
-		    type : "POST",
-		    url : "/api/scenarios/download_input_files",
-		    //data: { control_url: controlURL, data_url: dataURL, param_url: paramURL},
-		    data: jsonStr,
-		  	contentType: 'application/json',
+		    type : "GET",
+		    url : "/api/scenarios/download_input_files/" + url_info,
 		    success: function(result) {
 		    	displayModelModifier();
 		    }
