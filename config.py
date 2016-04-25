@@ -19,6 +19,13 @@ class Config:
     # MONGODB_DB = os.getenv('MONGODB_DB', 'scenarios')
     # MONGODB_PORT = os.getenv('MONGODB_PORT', 27017)
 
+    # these three files names are for data and control files
+    # these three files are in static/user_data/USERFOLDER
+
+    # TEMP_DATA = os.getenv('TEMP_DATA', '/temp_data.nc')
+    # TEMP_CONTROL = os.getenv('TEMP_CONTROL', '/temp_control.control')
+    # TEMP_PARAM = os.getenv('TEMP_PARAM', '/temp_param.nc')
+
 
 class DevelopmentConfig(Config):
 
@@ -27,12 +34,18 @@ class DevelopmentConfig(Config):
     MONGODB_SETTINGS = {'db': 'scenarios','host':'mongo'}
 
     BASE_PARAMETER_NC = 'app/static/data/LC.param.nc'
+    
+    TEMP_DATA = '/temp_data.nc'
+    TEMP_CONTROL = '/temp_control.control'
+    TEMP_PARAM = '/temp_param.nc'
 
     MODEL_HOST =\
         os.getenv('MODEL_HOST', default='http://192.168.99.100:5000/api')
 
     AUTH_HOST =\
         os.getenv('AUTH_HOST', default='http://192.168.99.100:5005/api')
+
+
 
 
 class TestingConfig(Config):

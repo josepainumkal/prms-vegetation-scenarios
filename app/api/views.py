@@ -87,37 +87,14 @@ def display_modelruns():
 def download_model_inputs(url_info):
     url_list = url_info.split('---')
     control_url = url_list[0].replace('+++','/')
-    app.logger.debug(control_url)
+    #app.logger.debug(control_url)
     data_url = url_list[1].replace('+++','/')
-    app.logger.debug(data_url)
+    #app.logger.debug(data_url)
     param_url = url_list[2].replace('+++','/')
-    app.logger.debug(param_url)
+    #app.logger.debug(param_url)
     # use the following function to download the three input files
     download_prms_inputs(control_url, data_url, param_url)
     return 'success'
-# @api.route('/api/scenarios/download_input_files', methods=['GET','POST'])
-# def download_model_inputs():
-#     # control_url = request.json['model_run'][0]['control_url']
-#     # data_url = request.json['model_run'][0]['data_url']
-#     # param_url = request.json['model_run'][0]['param_url']
-#     # # use the following function to download the three input files
-#     # download_prms_inputs(control_url, data_url, param_url)
-#     if request.method == 'POST':
-#         control_url = request.json['model_run'][0]['control_url']
-#         data_url = request.json['model_run'][0]['data_url']
-#         param_url = request.json['model_run'][0]['param_url']
-#         # use the following function to download the three input files
-#         download_prms_inputs(control_url, data_url, param_url)
-#         return 'success'
-#     elif request.method == 'GET':
-#         app.logger.debug('hello')
-#         control_url = request.json['model_run'][0]['control_url']
-#         app.logger.debug(control_url)
-#         data_url = request.json['model_run'][0]['data_url']
-#         param_url = request.json['model_run'][0]['param_url']
-#         # use the following function to download the three input files
-#         download_prms_inputs(control_url, data_url, param_url)
-#         return 'success'
     
 
 @api.route('/api/scenarios', methods=['GET', 'POST'])
@@ -126,6 +103,8 @@ def scenarios():
     Handle get and push requests for list of all finished scenarios and submit
     a new scenario, respectively.
     """
+    input_file_folder = find_user_folder()
+    BASE_PARAMETER_NC = input_file_folder + '/temp_param.nc'
     if request.method == 'GET':
 
         scenarios = Scenario.objects
@@ -133,14 +112,16 @@ def scenarios():
         # this is for the first three scenarios only
         if app.config['DEBUG'] and len(scenarios) < 3:
             for loop_counter in range(3):
-                _init_dev_db(app.config['BASE_PARAMETER_NC'], loop_counter)
+                _init_dev_db(BASE_PARAMETER_NC, loop_counter)
 
                 scenarios = Scenario.objects
 
         return jsonify(scenarios=scenarios)
 
     else:
-        BASE_PARAMETER_NC = app.config['BASE_PARAMETER_NC']
+        #app.logger.debug('Post request recevied')
+        
+        #app.logger.debug(BASE_PARAMETER_NC)
 
         # assemble parts of a new scenario record
         vegmap_json = request.json['veg_map_by_hru']

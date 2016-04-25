@@ -128,9 +128,11 @@ def download_prms_inputs(control_url,data_url,param_url):
     if not os.path.exists(app_root):
         os.mkdir(app_root)
 
-    control_file = app_root + '/temp_control.control'
-    data_file = app_root + '/temp_data.nc'
-    param_file = app_root + '/temp_param.nc'
+    # TODO clean the previous download input files
+    app.logger.debug(app.config['BASE_PARAMETER_NC'])
+    data_file = app_root + app.config['TEMP_DATA']
+    control_file = app_root + app.config['TEMP_CONTROL']
+    param_file = app_root + app.config['TEMP_PARAM']
 
     app.logger.debug(control_file) 
     # download three inputs file based on the urls

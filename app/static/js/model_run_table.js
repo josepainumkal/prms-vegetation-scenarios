@@ -54,6 +54,7 @@ $(document).ready(function(){
 	var firstPosition;
 	var secondPosition;
 
+	var vegCode;
 	var vegCodeLookup = {
 	0: 'bare_ground',
 	1: 'grasses',
@@ -340,7 +341,8 @@ $(document).ready(function(){
 	          success: function(result) {
 	          }
 	      });
-
+	      window.location='/scenario_table';
+	      
 	    });
 
 
