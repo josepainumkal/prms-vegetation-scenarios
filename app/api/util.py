@@ -91,17 +91,17 @@ def get_veg_map_by_hru(prms_params_file):
 
 
 def model_run_name(auth_host=None, model_host=None,
-        app_username=None, app_password=None):
+                   app_username=None, app_password=None):
     """
     the function is used to collect model run names
-    """ 
+    """
 
     cl = ModelApiClient(auth_host=auth_host, model_host=model_host)
     cl.authenticate_jwt(username=app_username, password=app_password)
 
     api = DefaultApi(api_client=cl)
 
-    # record all the model runs 
+    # record all the model runs
     model_run = api.search_modelruns().objects
 
     temp_list = [0] * len(model_run)
@@ -109,10 +109,11 @@ def model_run_name(auth_host=None, model_host=None,
     for loop_count in range(len(temp_list)):
         temp_item = model_run[loop_count]
         # for current version, we only display finished model run
-        if temp_item['progress_state'] =='FINISHED':
-            temp_list[loop_count] = {'id':temp_item['id']}
+        if temp_item['progress_state'] == 'FINISHED':
+            temp_list[loop_count] = {'id': temp_item['id']}
 
     return json.dumps(temp_list)
+
 
 def find_user_folder():
     username = app.config['APP_USERNAME']
@@ -122,23 +123,46 @@ def find_user_folder():
     app_root = app_root + '/../static/user_data/' + username_part
     return app_root
 
-def download_prms_inputs(control_url,data_url,param_url):
+
+def use_default_model_run():
+    app_root = find_user_folder()
+
+    if not os.path.exists(app_root):
+        os.mkdir(app_root)
+
+    default_data_folder = app_root + '/../../data/'
+
+    data_file = app_root + app.config['TEMP_DATA']
+    control_file = app_root + app.config['TEMP_CONTROL']
+    param_file = app_root + app.config['TEMP_PARAM']
+    # copy the default file
+    shutil.copyfile(default_data_folder +
+                    app.config['DEFAULT_CONTROL'], control_file)
+    shutil.copyfile(default_data_folder +
+                    app.config['DEFAULT_DATA'], data_file)
+    shutil.copyfile(default_data_folder +
+                    app.config['DEFAULT_PARAM'], param_file)
+
+
+def download_prms_inputs(control_url, data_url, param_url):
     app_root = find_user_folder()
 
     if not os.path.exists(app_root):
         os.mkdir(app_root)
 
     # TODO clean the previous download input files
-    app.logger.debug(app.config['BASE_PARAMETER_NC'])
     data_file = app_root + app.config['TEMP_DATA']
     control_file = app_root + app.config['TEMP_CONTROL']
     param_file = app_root + app.config['TEMP_PARAM']
+    # clean up previous download file
+    os.remove(data_file)
+    os.remove(control_file)
+    os.remove(param_file)
 
-    app.logger.debug(control_file) 
+    app.logger.debug(control_file)
     # download three inputs file based on the urls
     urllib.urlretrieve(control_url, control_file)
     urllib.urlretrieve(data_url, data_file)
     urllib.urlretrieve(param_url, param_file)
-    app.logger.debug('User: '+app.config['APP_USERNAME']+' finished downloading three input files') 
-
-
+    app.logger.debug(
+        'User: ' + app.config['APP_USERNAME'] + ' finished downloading three input files')

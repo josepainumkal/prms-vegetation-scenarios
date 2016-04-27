@@ -97,15 +97,36 @@ $(document).ready(function(){
 	function listModelRunID(data)
 	{
 		var itemCount = data.num_results;
-		for(var i=0; i<itemCount; i++)
+		if(itemCount != 0)
 		{
-			var tempItem = data.objects[i];
-			$('#model-run-items').append("<tr key="+tempItem.id.toString()+">" +
-											 "<td>"+tempItem.id.toString()+"</td>" +
-											 "<td>"+tempItem.created_at+"</td>" +
-											 // the button id is modelrunID
-											 "<td><button class='modelRunChosenButton' id='"+tempItem.id.toString()+"' >Choose Me</button>"+"</td>" +
-										 "</tr>");
+			for(var i=0; i<itemCount; i++)
+			{
+				var tempItem = data.objects[i];
+				$('#model-run-items').append("<tr key="+tempItem.id.toString()+">" +
+												 "<td>"+tempItem.id.toString()+"</td>" +
+												 "<td>"+tempItem.created_at+"</td>" +
+												 // the button id is modelrunID
+												 "<td><button class='modelRunChosenButton' id='"+tempItem.id.toString()+"' >Choose Me</button>"+"</td>" +
+											 "</tr>");
+			}
+		}
+		// there are no model runs in the model runserver
+		else
+		{
+			$('#additional-info').append("<p>You do not have a modelrun in the server, but no worries. We prepare a default model run for you</p>");
+			$.ajax({
+				type: "GET",
+				url: '/api/defaul_model_run',
+				error : function() {
+				},
+				success: function(data) {
+					$('#model-run-items').append("<tr key="+(-1).toString()+">" +
+													 "<td>default</td>" +
+													 "<td>default</td>" +												 
+													 "<td><button class='modelRunChosenButton' id='"+(-1).toString()+"' >Choose Me</button>"+"</td>" +
+												 "</tr>");					
+				}
+			});
 		}
 	}
 
@@ -116,27 +137,36 @@ $(document).ready(function(){
     	var modelRunID = $(this).attr('id');
     	$('#step-2-title-id').empty();
     	$('#step-2-title-id').append("<h5>2. Modify The Chosen Model Run</h5>");
-    	var modelRunURL = modelRunServer + '/' + modelRunID;
-    	// get the model run information
-		$.ajax({
-			type: "GET",
-			url: modelRunURL,
-			contentType: "application/json; charset=utf-8",
-			//dataType : 'jsonp',
-			beforeSend : function(xhr) {
-				// set header
-				xhr.setRequestHeader("Authorization", "JWT " + access_token);
-			},
-			//data: data,
-			error : function() {
-			  // error handler
-			  console.log('get model run information failed');
-			},
-			success: function(data) {
-			    // success handler
-			    importChosenModelRun(data);
-			}
-		});
+    	if(modelRunID != '-1')
+    	{
+	    	var modelRunURL = modelRunServer + '/' + modelRunID;
+	    	// get the model run information
+			$.ajax({
+				type: "GET",
+				url: modelRunURL,
+				contentType: "application/json; charset=utf-8",
+				//dataType : 'jsonp',
+				beforeSend : function(xhr) {
+					// set header
+					xhr.setRequestHeader("Authorization", "JWT " + access_token);
+				},
+				//data: data,
+				error : function() {
+				  // error handler
+				  console.log('get model run information failed');
+				},
+				success: function(data) {
+				    // success handler
+				    importChosenModelRun(data);
+				}
+			});
+		}
+		else
+		{
+			// initalize step 2 div
+			$('#step-2-content-id').empty();
+			displayModelModifier();
+		}
 	});
 
 	function importChosenModelRun(data)
@@ -324,11 +354,12 @@ $(document).ready(function(){
 	      // update json file based on the current HRU values
 	      updateJson();
 	      var scenarioName = $('#scenario-name-input').val();
+	      $('#patient-reminder').append("<p>The system is now processing scenario run request. Please be patient and it finish, the system will go to scenario table page</p>");
+	      $('#patient-reminder').append("<p>This is a bad design, will be improved in next version. Users will be able to run multiple scenarios</p>");
+	      $('#submitChangetoServerButton').css('visibility','hidden');
 	      $.ajax({
 	          type : "POST",
 	          url : "/api/scenarios",
-	          //url : "/api/scenarios",
-	          //data: JSON.stringify(inputJson, null, '\t'),
 	          data: JSON.stringify(
 	            {
 	              veg_map_by_hru: inputJson,
@@ -336,9 +367,10 @@ $(document).ready(function(){
 	            }, null, '\t'),
 	          contentType: 'application/json',
 	          success: function(result) {
+      		      window.location='/scenario_table';
 	          }
 	      });
-	      window.location='/scenario_table';
+
 	      
 	    });
 

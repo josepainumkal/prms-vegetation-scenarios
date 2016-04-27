@@ -39,6 +39,11 @@ class DevelopmentConfig(Config):
     TEMP_CONTROL = '/temp_control.control'
     TEMP_PARAM = '/temp_param.nc'
 
+    DEFAULT_DATA = '/LC.data.nc'
+    DEFAULT_CONTROL = '/LC.control'
+    DEFAULT_PARAM = '/LC.param.nc'
+
+
     MODEL_HOST =\
         os.getenv('MODEL_HOST', default='http://192.168.99.100:5000/api')
 

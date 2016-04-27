@@ -51,7 +51,7 @@ class ScenarioRun:
             os.mkdir('.tmp')
 
         self.scenario_file = os.path.join('.tmp', self.scenario_file)
-        
+
         shutil.copyfile(self.basefile, self.scenario_file)
         self.working_scenario = netCDF4.Dataset(self.scenario_file, 'r+')
 
@@ -135,10 +135,10 @@ class ScenarioRun:
         input_file_folder = find_user_folder()
 
         api.upload_resource_to_modelrun(
-            mr.id, 'control', input_file_folder+app.config['TEMP_CONTROL']
+            mr.id, 'control', input_file_folder + app.config['TEMP_CONTROL']
         )
         api.upload_resource_to_modelrun(
-            mr.id, 'data', input_file_folder+app.config['TEMP_DATA']
+            mr.id, 'data', input_file_folder + app.config['TEMP_DATA']
         )
         api.upload_resource_to_modelrun(
             mr.id, 'param', self.scenario_file
@@ -161,7 +161,6 @@ class ScenarioRun:
             raise RuntimeError('Model server execution failed!')
 
         return api.get_modelrun_by_id(mr.id)
-
 
 
 if __name__ == "__main__":
