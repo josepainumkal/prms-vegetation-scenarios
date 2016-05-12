@@ -140,6 +140,7 @@ $(document).ready(function(){
     	var modelRunID = $(this).attr('id');
     	$('#step-3-title-id').empty();
     	$('#step-3-title-id').append("<h5>3. Modify The Chosen Model Run Veg</h5>");
+    	$('#model-run-list').empty();
     	if(modelRunID != '-1')
     	{
 	    	var modelRunURL = modelRunServer + '/' + modelRunID;
@@ -414,8 +415,16 @@ $(document).ready(function(){
 
 			for(var i=0; i<recordNum; i++)
 			{
-				jsonData['temperature_values']['tmax'][i] = jsonData['temperature_values']['tmax'][i] * inputVal;
-				jsonData['temperature_values']['tmin'][i] = jsonData['temperature_values']['tmin'][i] * inputVal;
+				// -999 means do not change
+				if(jsonData['temperature_values']['tmax'][i] != -999)
+				{
+					jsonData['temperature_values']['tmax'][i] = jsonData['temperature_values']['tmax'][i] * inputVal;					
+				}
+				if(jsonData['temperature_values']['tmin'][i] != -999)
+				{
+					jsonData['temperature_values']['tmin'][i] = jsonData['temperature_values']['tmin'][i] * inputVal;
+				}
+				
 			}
 
 			console.log('temperature modification is done, factor is '+ inputVal.toString());
@@ -437,7 +446,6 @@ $(document).ready(function(){
 				  console.log('temperature modification failed');
 				},
 				success: function() {
-					console.log('aabsbascas');
 			    	vegeModifier();
 				}
 			});
