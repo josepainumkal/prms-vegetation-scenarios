@@ -233,8 +233,8 @@ def add_values_into_json(input_data_nc):
     endDate = datetime.date(endYear, endMonth, endDay)
 
     for dt in rrule(DAILY, dtstart=startDate, until=endDate):
-        timeStepValues.append(dt.strftime("%Y %m %d 0 0 0"))
-        # timeStepValues.append(dt.strftime("%Y-%m-%d 0:0:0"))
+        #timeStepValues.append(dt.strftime("%Y %m %d 0 0 0"))
+        timeStepValues.append(dt.strftime("%Y-%m-%dT00:00:00"))
     
     data = { 
               'temperature_values': varValues, \

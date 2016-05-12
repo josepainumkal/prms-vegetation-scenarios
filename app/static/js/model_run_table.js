@@ -354,8 +354,7 @@ $(document).ready(function(){
 	      // update json file based on the current HRU values
 	      updateJson();
 	      var scenarioName = $('#scenario-name-input').val();
-	      $('#patient-reminder').append("<p>The system is now processing scenario run request. Please be patient and it finish, the system will go to scenario table page</p>");
-	      $('#patient-reminder').append("<p>This is a bad design, will be improved in next version. Users will be able to run multiple scenarios</p>");
+	      $('#patient-reminder').append("<p>Processing Request ... ...</p>");
 	      $('#submitChangetoServerButton').css('visibility','hidden');
 	      $.ajax({
 	          type : "POST",
@@ -372,8 +371,9 @@ $(document).ready(function(){
 	      });
 
 	      // redirect to scenario html page
-	      // call this one after 1 sec, need give some time for post request and then redirect
-	      setTimeout(function(){ window.location='/scenario_table'; }, 1000);
+	      // call this one after 1.5 sec, need give some time for post request and then redirect
+	      // coz of js asychronization, without the 1.5 sec delay, it may redirect without send out the request
+	      setTimeout(function(){ window.location='/scenario_table'; }, 1500);
 	      //window.location='/scenario_table';
 	      
 	    });
@@ -458,7 +458,7 @@ $(document).ready(function(){
 
 			// init it with the same length of hydro
 			var timeStr;
-			var splitTimeStr;
+			//var splitTimeStr;
 			var tempDate;
 			var tempTmin;
 			var tempTmax;
@@ -473,8 +473,9 @@ $(document).ready(function(){
 					tempTmin = jsonData['temperature_values']['tmin'][i];
 
 					timeStr = jsonData['timestep_values'][i];
-					splitTimeStr = timeStr.split(' ');
-					tempDate = new Date(splitTimeStr[0]+'-'+splitTimeStr[1]+'-'+splitTimeStr[2]);
+					//
+					//splitTimeStr = timeStr.split(' ');
+					tempDate = new Date(timeStr);
 
 					chartData.push([tempDate,tempTmax,tempTmin]);			
 				}
@@ -487,8 +488,8 @@ $(document).ready(function(){
 					tempTmin = jsonData['temperature_values']['tmin'][i];
 
 					timeStr = jsonData['timestep_values'][i];
-					splitTimeStr = timeStr.split(' ');
-					tempDate = new Date(splitTimeStr[0]+'-'+splitTimeStr[1]+'-'+splitTimeStr[2]);
+					//splitTimeStr = timeStr.split(' ');
+					tempDate = new Date(timeStr);
 
 					chartData.push([tempDate,tempTmax,tempTmin]);
 				}
