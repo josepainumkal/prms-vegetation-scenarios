@@ -3,8 +3,9 @@ import netCDF4
 import shutil
 import urllib
 import os
+import datetime
 
-
+from dateutil.rrule import rrule, DAILY
 from numpy import where
 
 from ..models import VegetationMapByHRU, ProjectionInformation
@@ -166,3 +167,76 @@ def download_prms_inputs(control_url, data_url, param_url):
     urllib.urlretrieve(param_url, param_file)
     app.logger.debug(
         'User: ' + app.config['APP_USERNAME'] + ' finished downloading three input files')
+
+# lisa's function, grab temperature from data.nc
+# Rui modified it a little bit to fit current version program
+def add_values_into_json(input_data_nc):
+
+    variableList = []
+
+    fileHandle = netCDF4.Dataset(input_data_nc, 'r')
+    
+    # Extract number of time steps
+    dimensions = [dimension for dimension in fileHandle.dimensions] 
+    if 'time' in dimensions:
+        numberOfTimeSteps = len(fileHandle.dimensions['time'])
+
+    # extract tmax and tmin variables and append to a list
+    variables = [variable for variable in fileHandle.variables]
+    
+    if 'tmin' in variables:
+        variableList.append('tmin')
+    if 'tmax' in variables:
+        variableList.append('tmax')
+        
+    for index in range(len(variables)):
+        if '_' in variables[index]:
+            position = variables[index].find('_')
+            if 'tmax' in variables[index][0:position] or 'tmin' in variables[index][0:position]:
+                variableList.append(variables[index])
+
+    valueList = []
+    for index in range(len(variableList)):
+        valueList.append([])
+
+    for index in range(len(variableList)):
+        valueList[index] = fileHandle.variables[variableList[index]][:].flatten().tolist()
+    
+    varValues = {}
+
+    for index in range(len(variableList)):
+        varValues[variableList[index]] = valueList[index]
+
+    # Find time step values
+
+    timeStepValues = []
+
+    for variable in fileHandle.variables:
+        if variable == 'time':
+    
+            units = str(fileHandle.variables[variable].units)
+            startDate = units.rsplit(' ')[2]
+            startYear = int(startDate.rsplit('-')[0].strip())
+            startMonth = int(startDate.rsplit('-')[1].strip())
+            startDay = int(startDate.rsplit('-')[2].strip())
+            shape = str(fileHandle.variables[variable].shape)
+            numberOfValues = int(shape.rsplit(',')[0].strip('('))
+            endDate = str(datetime.date (startYear, startMonth, startDay) + datetime.timedelta (days = numberOfValues-1))
+            endYear = int(endDate.rsplit('-')[0].strip())
+            endMonth = int(endDate.rsplit('-')[1].strip())
+            endDay = int(endDate.rsplit('-')[2].strip())
+
+    startDate = datetime.date(startYear, startMonth, startDay)
+    endDate = datetime.date(endYear, endMonth, endDay)
+
+    for dt in rrule(DAILY, dtstart=startDate, until=endDate):
+        timeStepValues.append(dt.strftime("%Y %m %d 0 0 0"))
+    
+    data = { 
+              'temperature_values': varValues, \
+              'timestep_values': timeStepValues \
+           }
+    
+    fileHandle.close()
+
+    return json.dumps(data)

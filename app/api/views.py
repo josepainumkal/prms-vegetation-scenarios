@@ -17,7 +17,7 @@ from uuid import uuid4
 
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
-from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run
+from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json
 from PRMSCoverageTool import ScenarioRun
 
 
@@ -238,6 +238,55 @@ def get_user_access_token():
     json_msg = json.loads(msg)
 
     return json_msg['access_token']
+
+@api.route('/api/get_temperature')
+def get_temperature():
+    '''
+    This api get current user model run temperature as a json file
+    ''' 
+    app_root = find_user_folder()
+    data_file = app_root + app.config['TEMP_DATA']
+    return add_values_into_json(data_file)
+
+@api.route('/api/get_default_temperature')
+def get_default_temperature():
+    '''
+    This api get current user default model run temperature as a json file
+    '''
+    app_root = find_user_folder()
+
+    if not os.path.exists(app_root):
+        os.mkdir(app_root)
+
+    default_data_folder = app_root + '/../../data/'
+    #app.logger.debug(default_data_folder)
+    data_file = default_data_folder + app.config['DEFAULT_DATA']
+    #app.logger.debug(data_file)
+
+    return add_values_into_json(data_file)
+ 
+# will have to deal with default data.nc, this is tricky because we cannot change it, we 
+# need to restore data into another nc
+@api.route('/api/apply_modified_json_temperature', methods=['POST'])
+def apply_modified_temperature():
+    '''
+    This api change data.nc based on the json file
+    '''
+    # app_root = find_user_folder()
+
+    # if not os.path.exists(app_root):
+    #     os.mkdir(app_root)
+
+    # default_data_folder = app_root + '/../../data/'
+    # #app.logger.debug(default_data_folder)
+    # data_file = default_data_folder + app.config['DEFAULT_DATA']
+    # #app.logger.debug(data_file)
+    if request.method == 'POST':
+        app.logger.debug('need to go')
+
+        app.logger.debug(len(request.json['timestep_values']))
+
+        return 'success'
 
 
 @api.route('/api/base-veg-map', methods=['GET'])

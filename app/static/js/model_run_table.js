@@ -67,6 +67,9 @@ $(document).ready(function(){
 	var access_token;
 	var modelRunServer;
 
+	// this record how many model runs current user has
+	var itemCount;
+
 	$.get('/api/access_token', function(token){
 		access_token = token;
 
@@ -96,7 +99,7 @@ $(document).ready(function(){
 
 	function listModelRunID(data)
 	{
-		var itemCount = data.num_results;
+		itemCount = data.num_results;
 		if(itemCount != 0)
 		{
 			for(var i=0; i<itemCount; i++)
@@ -135,8 +138,8 @@ $(document).ready(function(){
     $(document).on("click", ".modelRunChosenButton" , function() {
     	// get the current button id
     	var modelRunID = $(this).attr('id');
-    	$('#step-2-title-id').empty();
-    	$('#step-2-title-id').append("<h5>2. Modify The Chosen Model Run</h5>");
+    	$('#step-3-title-id').empty();
+    	$('#step-3-title-id').append("<h5>3. Modify The Chosen Model Run Veg</h5>");
     	if(modelRunID != '-1')
     	{
 	    	var modelRunURL = modelRunServer + '/' + modelRunID;
@@ -163,17 +166,12 @@ $(document).ready(function(){
 		}
 		else
 		{
-			// initalize step 2 div
-			$('#step-2-content-id').empty();
 			displayModelModifier();
 		}
 	});
 
 	function importChosenModelRun(data)
 	{
-		// initalize step 2 div
-		$('#step-2-content-id').empty();
-
 		var controlURL;
 		var dataURL;
 		var paramURL;
@@ -212,10 +210,11 @@ $(document).ready(function(){
 
 	}
 
-	function displayModelModifier()
+	// this function is used to display veg modification section
+	function vegeModifier()
 	{
 	  $.get('/api/base-veg-map', function(data){
-	  	$('#model-modifier-div-id').css('visibility','visible');
+	  	$('#model-veg-modifier-div-id').css('visibility','visible');
 	    inputJson = data;
 
 	    // grab col and row num
@@ -229,6 +228,7 @@ $(document).ready(function(){
 	    var maxElevation = elevationInfo.max();
 	    // append input area and instruction
 	    // this part should be dynamically generated
+	    $('#elevationInputID').empty();
 	    $("#elevationInputID").append("<p>The elevation scale is from "+minElevation.toString()+" to "+maxElevation.toString()+"</p>");
 	    $("#elevationInputID").append("<input type='number' min='"+minElevation.toString()+"' max='"+maxElevation.toString()+"' step='0.1' id='elevationSelectorID'>");
 	    $("#elevationInputID").append("<input type='button' class='btn btn-sm btn-sm-map' id='confirmElevationButton' value='Update Map by Elevation' />");
@@ -367,10 +367,14 @@ $(document).ready(function(){
 	            }, null, '\t'),
 	          contentType: 'application/json',
 	          success: function(result) {
-      		      window.location='/scenario_table';
+	  		      
 	          }
 	      });
 
+	      // redirect to scenario html page
+	      // call this one after 1 sec, need give some time for post request and then redirect
+	      setTimeout(function(){ window.location='/scenario_table'; }, 1000);
+	      //window.location='/scenario_table';
 	      
 	    });
 
@@ -391,8 +395,146 @@ $(document).ready(function(){
 	  });
 	}
 
+	// this function is used to display temperature in a line chart
+	// and display factor modifier (input box) and confirm button
+	function temperatureModifier(data)
+	{
+		var chartData=[];
+		var jsonData = JSON.parse(data);
+		var recordNum = jsonData['temperature_values']['tmax'].length;
+
+		google.charts.load('current', {'packages':['corechart']});
+		google.charts.setOnLoadCallback(drawChart);
+
+		$('#step-2-title-id').empty();
+		$('#step-2-title-id').append("<h5>2. Modify The Chosen Model Run Temperature</h5>");
+
+		$('#confirmTemperatureButton').on("click", function() {
+			var inputVal = $('#temperatureModifierID').val();
+
+			for(var i=0; i<recordNum; i++)
+			{
+				jsonData['temperature_values']['tmax'][i] = jsonData['temperature_values']['tmax'][i] * inputVal;
+				jsonData['temperature_values']['tmin'][i] = jsonData['temperature_values']['tmin'][i] * inputVal;
+			}
+
+			console.log('temperature modification is done, factor is '+ inputVal.toString());
+
+			google.charts.setOnLoadCallback(drawChart);
+
+			$.ajax({
+				type : "POST",
+				url : "/api/apply_modified_json_temperature",
+				//not sure why data:jsonData, does not work
+				data: JSON.stringify(
+	            {
+	              temperature_values: jsonData['temperature_values'],
+	              timestep_values: jsonData['timestep_values']
+	            }, null, '\t'),
+				contentType: 'application/json',
+				error : function() {
+				  // error handler
+				  console.log('temperature modification failed');
+				},
+				success: function() {
+					console.log('aabsbascas');
+			    	vegeModifier();
+				}
+			});
+
+		});
+
+		function updateChartValues()
+		{
+			//initalize chart data
+			chartData = [];
+			// TODO process all the temperature value, such as tmin, tmin_1 ...
+			chartData.push(['time','tmax','tmin']);
+
+			if(jsonData['timestep_values'].length != recordNum)
+			{
+				console.log('Time and temperature array have different lengths.');
+			}
+
+			// init it with the same length of hydro
+			var timeStr;
+			var splitTimeStr;
+			var tempDate;
+			var tempTmin;
+			var tempTmax;
 
 
+			// if we have too many elements, we will sampling temperature
+			if(recordNum >= 1000)
+			{
+				for(var i=1; i<recordNum; i=i+20)
+				{
+					tempTmax = jsonData['temperature_values']['tmax'][i];
+					tempTmin = jsonData['temperature_values']['tmin'][i];
+
+					timeStr = jsonData['timestep_values'][i];
+					splitTimeStr = timeStr.split(' ');
+					tempDate = new Date(splitTimeStr[0]+'-'+splitTimeStr[1]+'-'+splitTimeStr[2]);
+
+					chartData.push([tempDate,tempTmax,tempTmin]);			
+				}
+			}
+			else
+			{
+				for(var i=0; i<recordNum; i++)
+				{
+					tempTmax = jsonData['temperature_values']['tmax'][i];
+					tempTmin = jsonData['temperature_values']['tmin'][i];
+
+					timeStr = jsonData['timestep_values'][i];
+					splitTimeStr = timeStr.split(' ');
+					tempDate = new Date(splitTimeStr[0]+'-'+splitTimeStr[1]+'-'+splitTimeStr[2]);
+
+					chartData.push([tempDate,tempTmax,tempTmin]);
+				}
+			}
+		}
+
+		function drawChart() 
+		{
+			updateChartValues();
+
+			var options = {
+	          title: 'Temperature',
+	          curveType: 'function',
+	          legend: { position: 'bottom' }
+	        };
+
+			var chart = new google.visualization.LineChart(document.getElementById('temperature-line-chart-id'));
+
+			var lineChartData = google.visualization.arrayToDataTable(chartData);
+
+			chart.draw(lineChartData, options);
+		}
+	}
+
+	function displayModelModifier()
+	{
+	  // get temperature info
+	  // no model run, so use default
+	  if(itemCount == 0)
+	  {
+	  	$.get('/api/get_default_temperature', function(data){
+	  		$('#step-2-dive-id').css('visibility','visible');
+	  		temperatureModifier(data);
+	  	});
+	  }
+	  else
+	  {
+	  	$.get('/api/get_temperature', function(data){
+	  		$('#step-2-dive-id').css('visibility','visible');
+	  		temperatureModifier(data);
+	  	});
+
+	  }
+	  // get vegetation info
+	  
+	}
 
 
   // this is used to find the length of an obj

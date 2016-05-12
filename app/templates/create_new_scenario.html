@@ -10,6 +10,7 @@
     <script type="text/javascript" src="/static/bower_components/chroma-js/chroma.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBINKUFZugKXNT1ieZy315WFViufQUZvv4"
     async defer></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="/static/js/vis/overlay_google_map.js"></script>
     <!-- THIS JS IS USED FOR 2D map polygon -->
     <script type="text/babel" src="/static/js/model_run_table.js"></script>
@@ -118,7 +119,10 @@
     .metaData {
       visibility: hidden;
     }
-    #model-modifier-div-id {
+    #model-veg-modifier-div-id {
+      visibility: hidden;
+    }
+    #step-2-dive-id {
       visibility: hidden;
     }
     </style>
@@ -158,9 +162,27 @@
 
     <div class="row" id='step-2-dive-id'>
         <div id='step-2-title-id'></div>
-        <div id='step-2-content-id'></div>
+        <div>
+          <p>If there are more than 1000, I will get every 20 temperature of all the records. I cannot show them all because the are too many records</p>
+        </div>
 
-        <div id='model-modifier-div-id'>
+        <div id='model-temperature-modifier-div-id'>
+          <div id='temperature-line-chart-id' style="width: 1200px; height: 900px">
+          </div>
+
+          <div id='temperature-controller-id'>
+            <p>Input the factor you want to change the temperature, if input is M then all the temperature T will be changed into T*M, M is bigger than 0</p>
+            <input type='number' min='0' step='0.01' id='temperatureModifierID'>
+            <input type='button' class='btn btn-sm btn-sm-map' id='confirmTemperatureButton' value='Update Temperature' />
+          </div>
+        </div>
+
+    </div>
+
+    <div class="row" id='step-3-dive-id'>
+        <div id='step-3-title-id'></div>
+
+        <div id='model-veg-modifier-div-id'>
            <div class="row">
                 <h2>Instructions</h2>
                 <p>
