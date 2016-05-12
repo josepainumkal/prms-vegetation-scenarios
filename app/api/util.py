@@ -155,18 +155,21 @@ def download_prms_inputs(control_url, data_url, param_url):
     data_file = app_root + app.config['TEMP_DATA']
     control_file = app_root + app.config['TEMP_CONTROL']
     param_file = app_root + app.config['TEMP_PARAM']
+
     # clean up previous download file
     os.remove(data_file)
     os.remove(control_file)
     os.remove(param_file)
 
-    app.logger.debug(control_file)
     # download three inputs file based on the urls
     urllib.urlretrieve(control_url, control_file)
     urllib.urlretrieve(data_url, data_file)
     urllib.urlretrieve(param_url, param_file)
+
     app.logger.debug(
         'User: ' + app.config['APP_USERNAME'] + ' finished downloading three input files')
+
+
 
 # lisa's function, grab temperature from data.nc
 # Rui modified it a little bit to fit current version program
@@ -231,6 +234,7 @@ def add_values_into_json(input_data_nc):
 
     for dt in rrule(DAILY, dtstart=startDate, until=endDate):
         timeStepValues.append(dt.strftime("%Y %m %d 0 0 0"))
+        # timeStepValues.append(dt.strftime("%Y-%m-%d 0:0:0"))
     
     data = { 
               'temperature_values': varValues, \
@@ -240,3 +244,22 @@ def add_values_into_json(input_data_nc):
     fileHandle.close()
 
     return json.dumps(data)
+
+def add_values_into_netcdf(original_nc, post_data, update_file):
+    '''
+    this function is bascially from Lisa, Rui changed it to fit the post request from
+    the client side
+    '''
+    temperature = post_data.json['temperature_values']
+
+
+    fileHandle = netCDF4.Dataset(original_nc, mode='a')
+
+    for index in range(len(temperature.keys())):
+        fileHandle.variables[temperature.keys()[index]][:] = \
+        temperature[temperature.keys()[index]]
+
+    shutil.move(original_nc, update_file)
+
+    
+    fileHandle.close()

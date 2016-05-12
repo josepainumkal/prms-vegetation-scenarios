@@ -17,7 +17,7 @@ from uuid import uuid4
 
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
-from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json
+from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf
 from PRMSCoverageTool import ScenarioRun
 
 
@@ -265,12 +265,14 @@ def get_default_temperature():
 
     return add_values_into_json(data_file)
  
-# will have to deal with default data.nc, this is tricky because we cannot change it, we 
-# need to restore data into another nc
+
 @api.route('/api/apply_modified_json_temperature', methods=['POST'])
 def apply_modified_temperature():
     '''
     This api change data.nc based on the json file
+    no matter users use the default data.nc or data.nc from
+    model run server, it is the same, coz util.use_default_model_run
+    copy the default data.nc into the user's data folder
     '''
     # app_root = find_user_folder()
 
@@ -284,7 +286,12 @@ def apply_modified_temperature():
     if request.method == 'POST':
         app.logger.debug('need to go')
 
-        app.logger.debug(len(request.json['timestep_values']))
+        app.logger.debug(type(request.json['temperature_values']))
+
+        app_root = find_user_folder()
+        data_file = app_root + app.config['TEMP_DATA']
+        # let's see if update file can be overwritten
+        add_values_into_netcdf(data_file, request, data_file)
 
         return 'success'
 
