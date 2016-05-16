@@ -60,6 +60,11 @@ $(document).ready(function(){
 	            window.open(hydrographURL, 'newwindow', 'width=900,height=1100');
 	        }
 
+	        var downloadHydroAsCSV = function(tempScenario) {
+	        	var downloadURL = '/api/return_hydro_info/' + tempScenario._id.$oid; 
+	        	window.open(downloadURL);
+	        }
+
 	        var deleteScenario = function(sc) {
 	          $.ajax({
 	              method: 'DELETE',
@@ -86,8 +91,8 @@ $(document).ready(function(){
 
 	                    <td>
 	                      <div className="download-link">
-	                        <a>
-	                          Check Details
+	                        <a onClick={downloadHydroAsCSV.bind(this,scenario)}>
+	                          Download Hydrograph as a CSV File
 	                        </a>
 	                      </div>
 	                    </td>
@@ -113,7 +118,7 @@ $(document).ready(function(){
 	                            <td><strong>Scenario Name</strong></td>
 	                            <td><strong>Time Finished</strong></td>
 	                            <td className="download-link"><strong>View Hydrograph</strong></td>
-	                            <td className="download-link"><strong>Display Scenario Resources & Modified Veg</strong></td>
+	                            <td className="download-link"><strong>Download Hydrograph CSV File</strong></td>
 	                            <td><strong>Delete Scenario</strong></td>
 	                        </tr>
 	                    </thead>

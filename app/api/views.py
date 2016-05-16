@@ -9,8 +9,12 @@ import math
 import netCDF4
 import os
 import urllib2
+import csv
+import StringIO
 
-from flask import jsonify, request, Response
+from werkzeug.datastructures import Headers
+from werkzeug.wrappers import Response
+from flask import jsonify, request, Response, make_response, stream_with_context
 from flask import current_app as app
 from urllib import urlretrieve
 from uuid import uuid4
@@ -104,6 +108,60 @@ def download_model_inputs(url_info):
 def prepare_default_model_run():
     use_default_model_run()
     return 'success'
+
+@api.route('/api/return_hydro_info/<scenario_id>')
+def return_hydro_info(scenario_id):
+    '''
+    This function is used to return all the hydro information
+    '''
+    # TODO extract hydro data based on id
+    # the id is an list separate by ---
+    final_csv_raw_data = []
+
+    id_list = scenario_id.split('---')
+    for temp_id in id_list:
+        scenarios = Scenario.objects(id=temp_id).first()
+        hydro_data_list = scenarios.hydrograph.streamflow_array
+        hydro_time_list = scenarios.hydrograph.time_array
+
+        final_csv_raw_data.append([temp_id, hydro_time_list, hydro_data_list])
+
+    if len(hydro_time_list) != len(hydro_data_list):
+        return 'time and data arrays are not the same length'
+    else:
+        # idea is from http://stackoverflow.com/questions/28011341/create-and-download-a-csv-file
+        def generate():
+            data = StringIO.StringIO()
+            w = csv.writer(data)
+
+            # write header
+            w.writerow(('timestamp', 'HydroValue'))
+            yield data.getvalue()
+            data.seek(0)
+            data.truncate(0)
+
+            # write each log item
+            # TODO this part final_csv_raw_data[0], coz create a csv file only based on
+            # the first scenario
+            for count in range(len(final_csv_raw_data[0][1])):
+                w.writerow((
+                    final_csv_raw_data[0][1][count].isoformat(), # format datetime as string
+                    final_csv_raw_data[0][2][count]
+                ))
+                yield data.getvalue()
+                data.seek(0)
+                data.truncate(0)
+
+        # add a filename
+        headers = Headers()
+        headers.set('Content-Disposition', 'attachment', filename='hydro.csv')
+
+        # stream the response as the data is generated
+        return Response(
+            stream_with_context(generate()),
+            mimetype='text/csv', headers=headers
+        )
+        
 
 
 @api.route('/api/scenarios', methods=['GET', 'POST'])
