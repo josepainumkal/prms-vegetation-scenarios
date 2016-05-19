@@ -18,6 +18,8 @@ class Config:
     APP_PASSWORD = os.getenv('APP_PASSWORD', '')
 
     # session
+    SECRET_KEY = os.environ.get('VW_SECRET_KEY','hard to guess string')
+
     SESSION_COOKIE_NAME = os.getenv(
         'PRMS_SESSION_COOKIE_NAME', 'vwsession')
     SESSION_COOKIE_DOMAIN = os.getenv(

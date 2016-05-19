@@ -9,6 +9,7 @@ from config import config
 from flask.ext.session import Session
 from flask.ext.security import Security
 from flask_sqlalchemy import SQLAlchemy
+from flask.ext.security import SQLAlchemyUserDatastore
 
 db = MongoEngine()
 session = Session()
@@ -37,6 +38,8 @@ def create_app(config_name):
     userdb.init_app(app)
     security.init_app(app,datastore=user_datastore)
     session.init_app(app)
+    # not sure why config part does not work
+    app.secret_key = 'many random bytes'
     
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)

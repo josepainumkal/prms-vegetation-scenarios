@@ -4,6 +4,8 @@ from . import db
 
 from . import userdb
 
+from flask.ext.security import UserMixin, RoleMixin
+
 roles_users = userdb.Table('roles_users',
                        userdb.Column('user_id', userdb.Integer(), userdb.ForeignKey('users.id')),
                        userdb.Column('role_id', userdb.Integer(), userdb.ForeignKey('roles.id')))
@@ -11,7 +13,7 @@ roles_users = userdb.Table('roles_users',
 
 class User(UserMixin, userdb.Model):
     __tablename__ = 'users'
-    __bind_key__ = 'users'
+    #__bind_key__ = 'users'
     id = userdb.Column(userdb.Integer, primary_key=True)
     email = userdb.Column(userdb.String(255), unique=True)
     password = userdb.Column(userdb.String(255))
