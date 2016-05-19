@@ -2,6 +2,7 @@
 Configuration for Flask Application 'NKN Metadata Editor'
 """
 import os
+from redis import Redis
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -15,16 +16,26 @@ class Config:
 
     APP_USERNAME = os.getenv('APP_USERNAME', '')
     APP_PASSWORD = os.getenv('APP_PASSWORD', '')
-    # MONGODB_HOST = os.getenv('MONGODB_HOST', 'mongo')
-    # MONGODB_DB = os.getenv('MONGODB_DB', 'scenarios')
-    # MONGODB_PORT = os.getenv('MONGODB_PORT', 27017)
 
-    # these three files names are for data and control files
-    # these three files are in static/user_data/USERFOLDER
+    # session
+    SESSION_COOKIE_NAME = os.getenv(
+        'PRMS_SESSION_COOKIE_NAME', 'vwsession')
+    SESSION_COOKIE_DOMAIN = os.getenv(
+        'PRMS_SESSION_COOKIE_DOMAIN', None)
+    SESSION_TYPE = os.getenv('PRMS_SESSION_TYPE', None)
+    PRMS_SESSION_REDIS_HOST = os.getenv(
+        'PRMS_SESSION_REDIS_HOST', None)
+    PRMS_SESSION_REDIS_PORT = os.getenv(
+        'PRMS_SESSION_REDIS_PORT', 6379)
+    PRMS_SESSION_REDIS_DB = os.getenv('PRMS_SESSION_REDIS_DB',0)
+    if PRMS_SESSION_REDIS_HOST:
+        SESSION_REDIS = Redis(host=PRMS_SESSION_REDIS_HOST,
+                              port=PRMS_SESSION_REDIS_PORT, db=PRMS_SESSION_REDIS_DB)
 
-    # TEMP_DATA = os.getenv('TEMP_DATA', '/temp_data.nc')
-    # TEMP_CONTROL = os.getenv('TEMP_CONTROL', '/temp_control.control')
-    # TEMP_PARAM = os.getenv('TEMP_PARAM', '/temp_param.nc')
+    # sqlalchemy
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        'SQLALCHEMY_DATABASE_URI', 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite'))
 
 
 class DevelopmentConfig(Config):

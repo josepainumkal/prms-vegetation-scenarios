@@ -24,6 +24,9 @@ from ..models import Scenario, Hydrograph, Inputs, Outputs
 from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf
 from PRMSCoverageTool import ScenarioRun
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
 
 @api.route('/api/scenarios/<scenario_id>', methods=['GET', 'DELETE'])
 def scenario_by_id(scenario_id):
@@ -409,3 +412,9 @@ def _init_dev_db(BASE_PARAMETER_NC, scenario_num=0):
     )
 
     new_scenario.save()
+
+
+@api.route('/api/test/user')
+def test_user():
+    print current_user.is_authenticated
+    print current_user.name

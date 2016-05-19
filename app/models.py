@@ -2,6 +2,42 @@ import json
 
 from . import db
 
+from . import userdb
+
+roles_users = userdb.Table('roles_users',
+                       userdb.Column('user_id', userdb.Integer(), userdb.ForeignKey('users.id')),
+                       userdb.Column('role_id', userdb.Integer(), userdb.ForeignKey('roles.id')))
+
+
+class User(UserMixin, userdb.Model):
+    __tablename__ = 'users'
+    __bind_key__ = 'users'
+    id = userdb.Column(userdb.Integer, primary_key=True)
+    email = userdb.Column(userdb.String(255), unique=True)
+    password = userdb.Column(userdb.String(255))
+    name = userdb.Column(userdb.String(255))
+    affiliation = userdb.Column(userdb.String(255))
+    state = userdb.Column(userdb.String(255))
+    city = userdb.Column(userdb.String(255))
+    active = userdb.Column(userdb.Boolean())
+    confirmed_at = userdb.Column(userdb.DateTime())
+    roles = userdb.relationship('Role', secondary=roles_users,
+                            backref=userdb.backref('users', lazy='dynamic'))
+    last_login_at = userdb.Column(userdb.DateTime())
+    current_login_at = userdb.Column(userdb.DateTime())
+    last_login_ip = userdb.Column(userdb.String(255))
+    current_login_ip = userdb.Column(userdb.String(255))
+    login_count = userdb.Column(userdb.Integer)
+
+    def __repr__(self):
+        return '<models.User[email=%s]>' % self.email
+
+
+class Role(RoleMixin, userdb.Model):
+    __tablename__ = 'roles'
+    id = userdb.Column(userdb.Integer(), primary_key=True)
+    name = userdb.Column(userdb.String(80), unique=True)
+    description = userdb.Column(userdb.String(255))
 
 class Hydrograph(db.EmbeddedDocument):
     """
