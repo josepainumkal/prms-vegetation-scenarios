@@ -21,11 +21,12 @@ from uuid import uuid4
 
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
+from flask import session
 from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf
 from PRMSCoverageTool import ScenarioRun
 
 # import ssl
-# ssl._create_default_https_context = ssl._create_unverified_context
+# ssl._create_default_https_context = ssl._create_unverified_context()
 
 # from flask_security.core import current_user
 from flask.ext.security import current_user
@@ -83,9 +84,7 @@ def scenario_by_id(scenario_id):
 def display_modelruns():
     temp_list = model_run_name(
         auth_host=app.config['AUTH_HOST'],
-        model_host=app.config['MODEL_HOST'],
-        app_username=app.config['APP_USERNAME'],
-        app_password=app.config['APP_PASSWORD']
+        model_host=app.config['MODEL_HOST']
     )
     return temp_list
 
@@ -103,7 +102,8 @@ def download_model_inputs(url_info):
     data_url = url_list[1].replace('+++', '/')
     # app.logger.debug(data_url)
     param_url = url_list[2].replace('+++', '/')
-    # app.logger.debug(param_url)
+    app.logger.debug(param_url)
+    app.logger.debug('test here')
     # use the following function to download the three input files
     download_prms_inputs(control_url, data_url, param_url)
     return 'success'
@@ -226,9 +226,7 @@ def scenarios():
 
         modelserver_run = scenario_run.run(
             auth_host=app.config['AUTH_HOST'],
-            model_host=app.config['MODEL_HOST'],
-            app_username=app.config['APP_USERNAME'],
-            app_password=app.config['APP_PASSWORD']
+            model_host=app.config['MODEL_HOST']
         )
 
         # TODO placeholder
@@ -288,19 +286,7 @@ def get_user_access_token():
     '''
     This api get current user acccess token
     '''
-    # prepare the post request
-    auth_host = app.config['AUTH_HOST'] + '/v1/auth'
-    req = urllib2.Request(auth_host)
-    req.add_header('Content-Type', 'application/json')
-
-    data = {"username": app.config['APP_USERNAME'],
-            "password": app.config['APP_PASSWORD']}
-    response = urllib2.urlopen(req, json.dumps(data))
-
-    msg = response.read()
-    json_msg = json.loads(msg)
-
-    return json_msg['access_token']
+    return session['api_token']
 
 @api.route('/api/get_temperature')
 def get_temperature():
@@ -347,8 +333,6 @@ def apply_modified_temperature():
     # data_file = default_data_folder + app.config['DEFAULT_DATA']
     # #app.logger.debug(data_file)
     if request.method == 'POST':
-        app.logger.debug('need to go')
-
         app.logger.debug(type(request.json['temperature_values']))
 
         app_root = find_user_folder()
@@ -415,9 +399,9 @@ def _init_dev_db(BASE_PARAMETER_NC, scenario_num=0):
 
     new_scenario.save()
 
-
+# this part is used to test the session working or not
 @api.route('/api/test/user')
 def test_user():
     print current_user.is_authenticated()
     print current_user.name
-    return str(current_user.is_authenticated()) + current_user.name
+    return str(current_user.is_authenticated()) + current_user.email

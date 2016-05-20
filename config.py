@@ -3,6 +3,7 @@ Configuration for Flask Application 'NKN Metadata Editor'
 """
 import os
 from redis import Redis
+from datetime import timedelta
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -14,8 +15,8 @@ class Config:
     def init_app(app):
         pass
 
-    APP_USERNAME = os.getenv('APP_USERNAME', '')
-    APP_PASSWORD = os.getenv('APP_PASSWORD', '')
+    # APP_USERNAME = os.getenv('APP_USERNAME', '')
+    # APP_PASSWORD = os.getenv('APP_PASSWORD', '')
 
     # session
     SECRET_KEY = os.environ.get('VW_SECRET_KEY','hard to guess string')
@@ -38,6 +39,18 @@ class Config:
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'SQLALCHEMY_DATABASE_URI', 'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite'))
+
+
+    #JWT
+
+    JWT_SECRET_KEY = os.environ.get('PRMS_APP_JWT_SECRET_KEY', 'virtualwatershed')
+    JWT_EXPIRATION_DELTA = timedelta(days=int(os.environ.get(
+        'PRMS_APP_JWT_EXPIRATION_DELTA', '30')))
+    JWT_AUTH_HEADER_PREFIX = os.environ.get(
+        'PRMS_APP_JWT_AUTH_HEADER_PREFIX', 'JWT')
+    # JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM','HS256')
+    # JWT_REQUIRED_CLAIMS = os.environ.get('JWT_REQUIRED_CLAIMS',['exp', 'iat', 'nbf'])
+    
 
 
 class DevelopmentConfig(Config):

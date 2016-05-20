@@ -11,6 +11,8 @@ from numpy import where
 from ..models import VegetationMapByHRU, ProjectionInformation
 
 from flask import current_app as app
+from flask import session
+from flask.ext.security import current_user
 
 from client.model_client.client import ModelApiClient
 from client.swagger_client.apis.default_api import DefaultApi
@@ -91,14 +93,12 @@ def get_veg_map_by_hru(prms_params_file):
     return vegmap
 
 
-def model_run_name(auth_host=None, model_host=None,
-                   app_username=None, app_password=None):
+def model_run_name(auth_host=None, model_host=None):
     """
     the function is used to collect model run names
     """
 
-    cl = ModelApiClient(auth_host=auth_host, model_host=model_host)
-    cl.authenticate_jwt(username=app_username, password=app_password)
+    cl = ModelApiClient(api_key=session['api_token'],auth_host=auth_host, model_host=model_host)
 
     api = DefaultApi(api_client=cl)
 
@@ -117,7 +117,7 @@ def model_run_name(auth_host=None, model_host=None,
 
 
 def find_user_folder():
-    username = app.config['APP_USERNAME']
+    username = current_user.email
     # get the first part of username as part of the final file name
     username_part = username.split('.')[0]
     app_root = os.path.dirname(os.path.abspath(__file__))
@@ -167,7 +167,7 @@ def download_prms_inputs(control_url, data_url, param_url):
     urllib.urlretrieve(param_url, param_file)
 
     app.logger.debug(
-        'User: ' + app.config['APP_USERNAME'] + ' finished downloading three input files')
+        'User: ' + current_user.email + ' finished downloading three input files')
 
 
 

@@ -7,6 +7,7 @@ import time
 
 from numpy import reshape
 from flask import current_app as app
+from flask import session
 
 from util import find_user_folder
 
@@ -101,8 +102,7 @@ class ScenarioRun:
             self.working_scenario.variables['cov_type'][:] = \
                 reshape(ctvec, ctmat.shape)
 
-    def run(self, auth_host=None, model_host=None,
-            app_username=None, app_password=None):
+    def run(self, auth_host=None, model_host=None):
         """
         Run PRMS on model server using the updated parameters file and
         standard data.nc and control.nc files.
@@ -122,8 +122,7 @@ class ScenarioRun:
             )
             return
 
-        cl = ModelApiClient(auth_host=auth_host, model_host=model_host)
-        cl.authenticate_jwt(username=app_username, password=app_password)
+        cl = ModelApiClient(api_key=session['api_token'],auth_host=auth_host, model_host=model_host)
 
         api = DefaultApi(api_client=cl)
 
