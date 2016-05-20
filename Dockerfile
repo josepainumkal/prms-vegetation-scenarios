@@ -1,10 +1,11 @@
-FROM ubuntu:14.04
+FROM python:2.7.11
 
 
 # Start installation with some necessary packages
 RUN apt-get update -y
 RUN apt-get install -y python-pip python-dev build-essential \
-    git wget curl unzip m4 openssh-client
+    git wget curl unzip m4 openssh-client libncurses5-dev
+RUN apt-get install -y libpq-dev libssl-dev libffi-dev
 
 # install nodejs
 RUN curl -sL https://deb.nodesource.com/setup_4.x | sh -
