@@ -50,6 +50,12 @@ class Config:
         'PRMS_APP_JWT_AUTH_HEADER_PREFIX', 'JWT')
     # JWT_ALGORITHM = os.environ.get('JWT_ALGORITHM','HS256')
     # JWT_REQUIRED_CLAIMS = os.environ.get('JWT_REQUIRED_CLAIMS',['exp', 'iat', 'nbf'])
+    # http://vw-dev:5000/api
+    MODEL_HOST =\
+        os.getenv('MODEL_HOST', default='http://vw-dev:5000/api')
+
+    AUTH_HOST =\
+        os.getenv('AUTH_HOST', default='http://vw-dev:5005/api')
     
 
 
@@ -70,11 +76,11 @@ class DevelopmentConfig(Config):
     DEFAULT_PARAM = '/LC.param.nc'
 
 
-    MODEL_HOST =\
-        os.getenv('MODEL_HOST', default='http://192.168.99.100:5000/api')
+    # MODEL_HOST =\
+    #     os.getenv('MODEL_HOST', default='http://192.168.99.100:5000/api')
 
-    AUTH_HOST =\
-        os.getenv('AUTH_HOST', default='http://192.168.99.100:5005/api')
+    # AUTH_HOST =\
+    #     os.getenv('AUTH_HOST', default='http://192.168.99.100:5005/api')
 
 
 
