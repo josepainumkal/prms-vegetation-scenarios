@@ -52,10 +52,10 @@ class Config:
     # JWT_REQUIRED_CLAIMS = os.environ.get('JWT_REQUIRED_CLAIMS',['exp', 'iat', 'nbf'])
     # http://vw-dev:5000/api
     MODEL_HOST =\
-        os.getenv('MODEL_HOST', default='http://vw-dev:5000/api')
+        os.getenv('MODEL_HOST', default='http://192.168.99.100:5000/api')
 
     AUTH_HOST =\
-        os.getenv('AUTH_HOST', default='http://vw-dev:5005/api')
+        os.getenv('AUTH_HOST', default='http://192.168.99.100:5005/api')
     
 
 
