@@ -14,8 +14,8 @@ from util import find_user_folder
 from client.model_client.client import ModelApiClient
 from client.swagger_client.apis.default_api import DefaultApi
 
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+# import ssl
+# ssl._create_default_https_context = ssl._create_unverified_context
 
 class ScenarioRun:
     """

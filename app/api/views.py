@@ -25,8 +25,8 @@ from flask import session
 from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf
 from PRMSCoverageTool import ScenarioRun
 
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
+# import ssl
+# ssl._create_default_https_context = ssl._create_unverified_context
 
 # from flask_security.core import current_user
 from flask.ext.security import current_user
