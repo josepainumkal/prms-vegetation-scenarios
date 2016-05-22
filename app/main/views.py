@@ -23,11 +23,11 @@ def set_api_token(func):
         return func(*args, **kwargs)
     return decorated
 
-@main.route('/scenario_table')
+@main.route('/')
 @login_required
 @set_api_token
 def show_all_modelruns():
-    return render_template('scenario_table.html')
+    return render_template('scenario_table.html', timeout = app.config['AJAX_TIMEOUT'])
 
 
 @main.route('/create_new_scenario')
