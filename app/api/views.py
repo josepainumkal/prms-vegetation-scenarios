@@ -262,7 +262,9 @@ def scenarios():
         urlretrieve(statsvar, tmp_statsvar)
 
         d = netCDF4.Dataset(tmp_statsvar, 'r')
-        cfs = d['basin_cfs_1'][:]
+        # justin nc file has different name
+        cfs = d['sub_cfs_1'][:]
+        #cfs = d['basin_cfs_1'][:]
 
         t = d.variables['time']
 

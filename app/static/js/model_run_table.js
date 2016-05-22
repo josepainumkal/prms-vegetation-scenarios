@@ -221,6 +221,7 @@ $(document).ready(function(){
 	    // grab col and row num
 	    dataX = inputJson['projection_information']['ncol'];
 	    dataY = inputJson['projection_information']['nrow'];
+	    
 
 	    vegOrigin = obtainJsoninto1D(inputJson);
 
@@ -240,6 +241,7 @@ $(document).ready(function(){
 
 	    canvasWidth = cellWidth*dataX;
 	    canvasHeight = cellHeight*dataY;
+	    
 	    // I am so confusing at this part...
 	    // If I change it into $('.mapCanvas').css('width',canvasWidth.toString()+'px');
 	    // then it only draw 30 boxes each line
@@ -374,7 +376,7 @@ $(document).ready(function(){
 	      // redirect to scenario html page
 	      // call this one after 1.5 sec, need give some time for post request and then redirect
 	      // coz of js asychronization, without the 1.5 sec delay, it may redirect without send out the request
-	      setTimeout(function(){ window.location='/scenario_table'; }, 1500);
+	      setTimeout(function(){ window.location='/scenario_table'; }, 10000);
 	      //window.location='/scenario_table';
 	      
 	    });
@@ -593,6 +595,7 @@ $(document).ready(function(){
           inputJson[vegType].push(hruNum);
         }
       }
+  
   }
 
 
@@ -657,6 +660,7 @@ $(document).ready(function(){
           canvas2DContext.rect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
         }
       }
+    
       canvas2DContext.stroke();
   }
 
@@ -743,7 +747,7 @@ $(document).ready(function(){
         }
       }
     }
-
+	
   }
 
   function changeCanvasCellColor(mousePosition,color)
@@ -795,6 +799,7 @@ $(document).ready(function(){
         }
       }
     }
+  
   }
 
 

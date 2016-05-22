@@ -8,6 +8,7 @@ import os.path
 
 from dateutil.rrule import rrule, DAILY
 from numpy import where
+import numpy
 
 from ..models import VegetationMapByHRU, ProjectionInformation
 
@@ -64,8 +65,10 @@ def get_veg_map_by_hru(prms_params_file):
     # longitudes get increasingly negative from right to left
     lower_left_lon = prms_params.variables['lon'][:][0]
     upper_right_lon = prms_params.variables['lon'][:][-1]
-
-    ctv = prms_params.variables['cov_type'][:].flatten()
+    # justin's nc is transposed
+    temp_veg = numpy.transpose(prms_params.variables['cov_type'][:])
+    ctv = temp_veg.flatten()
+    #ctv = prms_params.variables['cov_type'][:].flatten()
 
     projection_information = ProjectionInformation(
         ncol=prms_params.number_of_columns,
