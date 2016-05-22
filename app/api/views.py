@@ -392,7 +392,7 @@ def _init_dev_db(BASE_PARAMETER_NC, scenario_num=0):
 
     new_scenario = Scenario(
         name=name,
-        user_id = current_user.id
+        user_id = current_user.id,
         time_received=time_received,
         time_finished=time_finished,
         veg_map_by_hru=updated_veg_map_by_hru,
