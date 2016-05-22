@@ -4,6 +4,7 @@ import shutil
 import urllib
 import os
 import datetime
+import os.path
 
 from dateutil.rrule import rrule, DAILY
 from numpy import where
@@ -157,9 +158,15 @@ def download_prms_inputs(control_url, data_url, param_url):
     param_file = app_root + app.config['TEMP_PARAM']
 
     # clean up previous download file
-    os.remove(data_file)
-    os.remove(control_file)
-    os.remove(param_file)
+    if os.path.isfile(data_file):
+        os.remove(data_file)
+
+    if os.path.isfile(control_file):
+        os.remove(control_file)
+        
+    if os.path.isfile(param_file):
+        os.remove(param_file)
+    
 
     # download three inputs file based on the urls
     urllib.urlretrieve(control_url, control_file)
