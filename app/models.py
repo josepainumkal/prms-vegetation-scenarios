@@ -96,7 +96,8 @@ class Scenario(db.Document):
     Scenario data and metadata
     """
     name = db.StringField(required=True)
-    user = db.StringField(default='anonymous')
+    # user = db.StringField()
+    user_id = db.IntField()
 
     time_received = db.DateTimeField(required=True)
     time_finished = db.DateTimeField()

@@ -179,7 +179,7 @@ def scenarios():
     BASE_PARAMETER_NC = input_file_folder + app.config['TEMP_PARAM']
     if request.method == 'GET':
 
-        scenarios = Scenario.objects
+        scenarios = Scenario.objects(user_id=current_user.id)
 
         # this is for the first three scenarios only
         if app.config['DEBUG'] and len(scenarios) < 3:
@@ -217,6 +217,7 @@ def scenarios():
         scenario_run.finalize_run()
 
         new_scenario = Scenario(
+            user_id = current_user.id,
             name=name,
             time_received=time_received,
             veg_map_by_hru=get_veg_map_by_hru(scenario_run.scenario_file)

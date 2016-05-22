@@ -78,7 +78,7 @@
 
 <script type="text/babel">
 ReactDOM.render(
-    <ScenarioListBox pollInterval={5000} />,
+    <ScenarioListBox pollInterval={config['AJAX_TIMEOUT']} />,
     document.getElementById('scenario-list')
 );
 </script>

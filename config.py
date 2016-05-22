@@ -58,6 +58,7 @@ class Config:
     AUTH_HOST =\
         os.getenv('AUTH_HOST', 'https://192.168.99.100:5005/api')
     
+    AJAX_TIMEOUT = os.getenv('AJAX_TIMEOUT', '10000')
 
 
 class DevelopmentConfig(Config):
