@@ -182,11 +182,11 @@ def scenarios():
         scenarios = Scenario.objects(user_id=current_user.id)
 
         # this is for the first three scenarios only
-        if app.config['DEBUG'] and len(scenarios) < 3:
-            for loop_counter in range(3):
-                _init_dev_db(BASE_PARAMETER_NC, loop_counter)
+        # if app.config['DEBUG'] and len(scenarios) < 3:
+        #     for loop_counter in range(3):
+        #         _init_dev_db(BASE_PARAMETER_NC, loop_counter)
 
-                scenarios = Scenario.objects
+        #         scenarios = Scenario.objects
 
         return jsonify(scenarios=scenarios)
 
@@ -206,7 +206,7 @@ def scenarios():
         scenario_run = ScenarioRun(BASE_PARAMETER_NC)
 
         scenario_run.initialize(name)
-
+        # should change here to transpose it back
         scenario_run.update_cov_type(vegmap_json['bare_ground'], 0)
         scenario_run.update_cov_type(vegmap_json['grasses'], 1)
         scenario_run.update_cov_type(vegmap_json['shrubs'], 2)

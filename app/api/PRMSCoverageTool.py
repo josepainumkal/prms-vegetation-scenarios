@@ -6,6 +6,7 @@ import os
 import time
 
 from numpy import reshape
+import numpy
 from flask import current_app as app
 from flask import session
 
@@ -99,10 +100,16 @@ class ScenarioRun:
         if hru != []:
 
             ctmat = self.working_scenario.variables['cov_type'][:]
+            
             ctvec = ctmat.flatten()
             ctvec[hru] = val
             self.working_scenario.variables['cov_type'][:] = \
                 reshape(ctvec, ctmat.shape)
+
+            # TODO check if this part works
+            # doing this coz justin nc is transposed
+            temp_cov_type = self.working_scenario.variables['cov_type'][:]
+            self.working_scenario.variables['cov_type'][:] = numpy.transpose(temp_cov_type)
 
     def run(self, auth_host=None, model_host=None):
         """
