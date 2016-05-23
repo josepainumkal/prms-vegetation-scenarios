@@ -46,6 +46,7 @@ def propagate_all_vegetation_changes(original_prms_params, veg_map_by_hru):
     return ret
 
 
+model_run = 0
 def get_veg_map_by_hru(prms_params_file):
     """
     Create the vegetation map by HRU, which will also include the elevations
@@ -66,9 +67,12 @@ def get_veg_map_by_hru(prms_params_file):
     lower_left_lon = prms_params.variables['lon'][:][0]
     upper_right_lon = prms_params.variables['lon'][:][-1]
     # justin's nc is transposed
-    temp_veg = numpy.transpose(prms_params.variables['cov_type'][:])
-    ctv = temp_veg.flatten()
-    #ctv = prms_params.variables['cov_type'][:].flatten()
+    if model_run == 0:
+        temp_veg = numpy.transpose(prms_params.variables['cov_type'][:])
+        ctv = temp_veg.flatten()
+        model_run = model_run + 1
+    else:
+        ctv = prms_params.variables['cov_type'][:].flatten()
 
     projection_information = ProjectionInformation(
         ncol=prms_params.number_of_columns,
