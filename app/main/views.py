@@ -23,7 +23,7 @@ def set_api_token(func):
         return func(*args, **kwargs)
     return decorated
 
-@main.route('/scenario_table')
+@main.route('/')
 @login_required
 @set_api_token
 def show_all_modelruns():
