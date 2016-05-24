@@ -31,6 +31,25 @@ from PRMSCoverageTool import ScenarioRun
 # from flask_security.core import current_user
 from flask.ext.security import current_user
 
+@api.route('/api/scenarios/metadata/<scenario_id>')
+def metadata_scenario_by_id(scenario_id):
+    '''
+    only get meta data
+    '''
+    scenario = Scenario.objects(id=scenario_id).first()
+
+    if scenario:
+        return jsonify(scenario=scenario.to_json_simple())
+
+    else:
+        return Response(
+            json.dumps(
+                {'message': 'no scenario id found! ' +
+                            'currently the scenario id must be 1 or 0!'}
+            ), 400, mimetype='application/json'
+        )
+
+
 @api.route('/api/scenarios/<scenario_id>', methods=['GET', 'DELETE'])
 def scenario_by_id(scenario_id):
     """
@@ -168,6 +187,23 @@ def return_hydro_info(scenario_id):
         )
         
 
+@api.route('/api/scenarios/metadata')
+def metadata_all_scenarios():
+    '''
+    get the meta data only
+    '''
+    scenarios = Scenario.objects(user_id=current_user.id)
+
+    final_list = []
+    final_dict = {}
+
+    for temp_item in scenarios:
+        # temp_item is class Scenario
+        final_list.append({'name':temp_item['name'],'_id':{'$oid':str(temp_item['id'])},'time_finished':str(temp_item['time_finished'])})
+
+    final_dict = {'scenarios':final_list}
+    return json.dumps(final_dict)
+
 
 @api.route('/api/scenarios', methods=['GET', 'POST'])
 def scenarios():
@@ -180,13 +216,6 @@ def scenarios():
     if request.method == 'GET':
 
         scenarios = Scenario.objects(user_id=current_user.id)
-
-        # this is for the first three scenarios only
-        # if app.config['DEBUG'] and len(scenarios) < 3:
-        #     for loop_counter in range(3):
-        #         _init_dev_db(BASE_PARAMETER_NC, loop_counter)
-
-        #         scenarios = Scenario.objects
 
         return jsonify(scenarios=scenarios)
 

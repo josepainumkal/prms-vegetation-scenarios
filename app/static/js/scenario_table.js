@@ -15,11 +15,12 @@ $(document).ready(function(){
 
 	    loadScenariosFromServer: function() {
 	        $.ajax({
-	            url: '/api/scenarios',
+	            url: '/api/scenarios/metadata',
 	            dataType: 'json',
 	            cache: false,
 	            success: function(data) {
 	                this.setState({data: data});
+	                //console.log(data.length);
 	            }.bind(this),
 	            error: function(xhr, status, err) {
 	                console.error(this.props.url, status, err.toString());
@@ -77,8 +78,8 @@ $(document).ready(function(){
 	                <tr key={scenario._id.$oid}>
 	                    <td>{scenario.name}</td>
 	                    <td>{
-	                           scenario.time_finished ?
-	                           new Date(scenario.time_finished.$date).toISOString().slice(0,19) :
+	                           scenario.time_finished != "None" ?
+	                           scenario.time_finished :
 	                           "Pending"
 	                        }
 	                    </td>

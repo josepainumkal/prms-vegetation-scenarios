@@ -128,6 +128,16 @@ class Scenario(db.Document):
 
         return json.dumps(js_dict)
 
+    def to_json_simple(self):
+        """
+        Override db.Document's to_json for custom date fomratting
+        only get meta data
+        """
+
+        js_dict = {'time_received':self.time_received.isoformat(), 'time_finished':self.time_finished.isoformat(),'id':str(self.pk)}
+
+        return json.dumps(js_dict)
+
     def __str__(self):
 
         return \
