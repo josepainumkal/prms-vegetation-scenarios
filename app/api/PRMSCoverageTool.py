@@ -108,8 +108,8 @@ class ScenarioRun:
 
             # TODO check if this part works
             # doing this coz justin nc is transposed
-            temp_cov_type = self.working_scenario.variables['cov_type'][:]
-            self.working_scenario.variables['cov_type'][:] = numpy.transpose(temp_cov_type)
+            # temp_cov_type = self.working_scenario.variables['cov_type'][:]
+            # self.working_scenario.variables['cov_type'][:] = numpy.transpose(temp_cov_type)
 
     def run(self, auth_host=None, model_host=None):
         """

@@ -293,8 +293,8 @@ def scenarios():
 
         d = netCDF4.Dataset(tmp_statsvar, 'r')
         # justin nc file has different name
-        cfs = d['sub_cfs_1'][:]
-        #cfs = d['basin_cfs_1'][:]
+        #cfs = d['sub_cfs_1'][:]
+        cfs = d['basin_cfs_1'][:]
 
         t = d.variables['time']
 

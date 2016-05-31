@@ -67,7 +67,8 @@ def get_veg_map_by_hru(prms_params_file):
     lower_left_lon = prms_params.variables['lon'][:][0]
     upper_right_lon = prms_params.variables['lon'][:][-1]
 
-    temp_veg = numpy.transpose(prms_params.variables['cov_type'][:])
+    # temp_veg = numpy.transpose(prms_params.variables['cov_type'][:])
+    temp_veg = prms_params.variables['cov_type'][:]
     ctv = temp_veg.flatten()
 
     projection_information = ProjectionInformation(
