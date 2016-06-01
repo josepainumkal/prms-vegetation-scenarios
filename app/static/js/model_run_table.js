@@ -466,7 +466,7 @@ $(document).ready(function(){
 			//initalize chart data
 			chartData = [];
 			// TODO process all the temperature value, such as tmin_2, tmin_1 ...
-			chartData.push(['time','tmax_1','tmin_1','tmax_2','tmin_2']);
+			chartData.push(['time','tmax','tmin']);
 
 			if(jsonData['timestep_values'].length != recordNum)
 			{
@@ -477,10 +477,9 @@ $(document).ready(function(){
 			var timeStr;
 			//var splitTimeStr;
 			var tempDate;
-			var tempTmin_1;
-			var tempTmax_1;
-			var tempTmin_2;
-			var tempTmax_2;
+			var tempTmin;
+			var tempTmax;
+			
 
 
 			// if we have too many elements, we will sampling temperature
@@ -488,34 +487,31 @@ $(document).ready(function(){
 			{
 				for(var i=1; i<recordNum; i=i+20)
 				{
-					tempTmax_1 = jsonData['temperature_values']['tmax_1'][i];
-					tempTmin_1 = jsonData['temperature_values']['tmin_1'][i];
-					tempTmax_2 = jsonData['temperature_values']['tmax_2'][i];
-					tempTmin_2 = jsonData['temperature_values']['tmin_2'][i];
+					tempTmax = jsonData['temperature_values']['tmax'][i];
+					tempTmin = jsonData['temperature_values']['tmin'][i];
+
 
 					timeStr = jsonData['timestep_values'][i];
 					//
 					//splitTimeStr = timeStr.split(' ');
 					tempDate = new Date(timeStr);
 
-					chartData.push([tempDate,tempTmax_1,tempTmin_1,tempTmax_2,tempTmin_2]);			
+					chartData.push([tempDate,tempTmax,tempTmin]);
 				}
 			}
 			else
 			{
 				for(var i=0; i<recordNum; i++)
 				{
-					tempTmax_1 = jsonData['temperature_values']['tmax_1'][i];
-					tempTmin_1 = jsonData['temperature_values']['tmin_1'][i];
-					tempTmax_2 = jsonData['temperature_values']['tmax_2'][i];
-					tempTmin_2 = jsonData['temperature_values']['tmin_2'][i];
+					tempTmax = jsonData['temperature_values']['tmax'][i];
+					tempTmin = jsonData['temperature_values']['tmin'][i];
 
 					timeStr = jsonData['timestep_values'][i];
 					//
 					//splitTimeStr = timeStr.split(' ');
 					tempDate = new Date(timeStr);
 
-					chartData.push([tempDate,tempTmax_1,tempTmin_1,tempTmax_2,tempTmin_2]);		
+					chartData.push([tempDate,tempTmax,tempTmin]);		
 				}
 			}
 		}
