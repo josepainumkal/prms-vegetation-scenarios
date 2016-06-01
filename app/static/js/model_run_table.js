@@ -404,7 +404,7 @@ $(document).ready(function(){
 	{
 		var chartData=[];
 		var jsonData = JSON.parse(data);
-		var recordNum = jsonData['temperature_values']['tmax_1'].length;
+		var recordNum = jsonData['temperature_values']['tmax'].length;
 
 		google.charts.load('current', {'packages':['corechart']});
 		google.charts.setOnLoadCallback(drawChart);
@@ -418,22 +418,22 @@ $(document).ready(function(){
 			for(var i=0; i<recordNum; i++)
 			{
 				// -999 means do not change
-				if(jsonData['temperature_values']['tmax_1'][i] != -999)
+				if(jsonData['temperature_values']['tmax'][i] != -999)
 				{
-					jsonData['temperature_values']['tmax_1'][i] = jsonData['temperature_values']['tmax_1'][i] * inputVal;					
+					jsonData['temperature_values']['tmax'][i] = jsonData['temperature_values']['tmax'][i] * inputVal;					
 				}
-				if(jsonData['temperature_values']['tmin_1'][i] != -999)
+				if(jsonData['temperature_values']['tmin'][i] != -999)
 				{
-					jsonData['temperature_values']['tmin_1'][i] = jsonData['temperature_values']['tmin_1'][i] * inputVal;
+					jsonData['temperature_values']['tmin'][i] = jsonData['temperature_values']['tmin'][i] * inputVal;
 				}
-				if(jsonData['temperature_values']['tmax_2'][i] != -999)
-				{
-					jsonData['temperature_values']['tmax_2'][i] = jsonData['temperature_values']['tmax_2'][i] * inputVal;					
-				}
-				if(jsonData['temperature_values']['tmin_2'][i] != -999)
-				{
-					jsonData['temperature_values']['tmin_2'][i] = jsonData['temperature_values']['tmin_2'][i] * inputVal;
-				}
+				// if(jsonData['temperature_values']['tmax_2'][i] != -999)
+				// {
+				// 	jsonData['temperature_values']['tmax_2'][i] = jsonData['temperature_values']['tmax_2'][i] * inputVal;					
+				// }
+				// if(jsonData['temperature_values']['tmin_2'][i] != -999)
+				// {
+				// 	jsonData['temperature_values']['tmin_2'][i] = jsonData['temperature_values']['tmin_2'][i] * inputVal;
+				// }
 			}
 
 			console.log('temperature modification is done, factor is '+ inputVal.toString());
