@@ -123,8 +123,8 @@ def download_model_inputs(url_info):
     data_url = url_list[1].replace('+++', '/')
     # app.logger.debug(data_url)
     param_url = url_list[2].replace('+++', '/')
-    app.logger.debug(param_url)
-    app.logger.debug('test here')
+    #app.logger.debug(param_url)
+    #app.logger.debug('test here')
     # use the following function to download the three input files
     download_prms_inputs(control_url, data_url, param_url)
     return 'success'
@@ -457,8 +457,8 @@ def upload():
         app_root = find_user_folder()
         file_location = app_root + app.config['TEMP_VIS'] + '/' + filename
         file.save(file_location)
-        # TODO return the variable names in the
-        print get_nc_variable_name(file_location)
+        # TODO return the variable names in the select boxes
+        app.logger.debug(get_nc_variable_name(file_location))
         return 'success'
 
 # this part is used to test the session working or not
