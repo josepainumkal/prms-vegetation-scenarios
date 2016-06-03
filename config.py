@@ -60,6 +60,17 @@ class Config:
     
     AJAX_TIMEOUT = os.getenv('AJAX_TIMEOUT', '10000')
 
+    BASE_PARAMETER_NC = 'app/static/data/LC.param.nc'
+    
+    TEMP_DATA = '/temp_data.nc'
+    TEMP_CONTROL = '/temp_control.control'
+    TEMP_PARAM = '/temp_param.nc'
+    TEMP_VIS = '/vis.nc'
+
+    DEFAULT_DATA = '/LC.data.nc'
+    DEFAULT_CONTROL = '/LC.control'
+    DEFAULT_PARAM = '/LC.param.nc'
+
 
 class DevelopmentConfig(Config):
 
@@ -67,15 +78,7 @@ class DevelopmentConfig(Config):
 
     MONGODB_SETTINGS = {'db': 'scenarios','host':'mongo'}
 
-    BASE_PARAMETER_NC = 'app/static/data/LC.param.nc'
-    
-    TEMP_DATA = '/temp_data.nc'
-    TEMP_CONTROL = '/temp_control.control'
-    TEMP_PARAM = '/temp_param.nc'
 
-    DEFAULT_DATA = '/LC.data.nc'
-    DEFAULT_CONTROL = '/LC.control'
-    DEFAULT_PARAM = '/LC.param.nc'
 
 
     # MODEL_HOST =\

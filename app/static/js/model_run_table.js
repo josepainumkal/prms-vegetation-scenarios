@@ -376,7 +376,7 @@ $(document).ready(function(){
 	      // redirect to scenario html page
 	      // call this one after 1.5 sec, need give some time for post request and then redirect
 	      // coz of js asychronization, without the 1.5 sec delay, it may redirect without send out the request
-	      setTimeout(function(){ window.location='/'; }, 6000);
+	      setTimeout(function(){ window.location='/'; }, 10000);
 	      //window.location='/scenario_table';
 	      
 	    });

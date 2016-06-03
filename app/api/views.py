@@ -14,6 +14,7 @@ import StringIO
 
 from werkzeug.datastructures import Headers
 from werkzeug.wrappers import Response
+from werkzeug import secure_filename
 from flask import jsonify, request, Response, make_response, stream_with_context
 from flask import current_app as app
 from urllib import urlretrieve
@@ -22,7 +23,7 @@ from uuid import uuid4
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
 from flask import session
-from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf
+from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name
 from PRMSCoverageTool import ScenarioRun
 
 # import ssl
@@ -30,6 +31,7 @@ from PRMSCoverageTool import ScenarioRun
 
 # from flask_security.core import current_user
 from flask.ext.security import current_user
+
 
 @api.route('/api/scenarios/metadata/<scenario_id>')
 def metadata_scenario_by_id(scenario_id):
@@ -133,6 +135,7 @@ def prepare_default_model_run():
     use_default_model_run()
     return 'success'
 
+
 @api.route('/api/return_hydro_info/<scenario_id>')
 def return_hydro_info(scenario_id):
     '''
@@ -153,7 +156,8 @@ def return_hydro_info(scenario_id):
     if len(hydro_time_list) != len(hydro_data_list):
         return 'time and data arrays are not the same length'
     else:
-        # idea is from http://stackoverflow.com/questions/28011341/create-and-download-a-csv-file
+        # idea is from
+        # http://stackoverflow.com/questions/28011341/create-and-download-a-csv-file
         def generate():
             data = StringIO.StringIO()
             w = csv.writer(data)
@@ -169,7 +173,8 @@ def return_hydro_info(scenario_id):
             # the first scenario
             for count in range(len(final_csv_raw_data[0][1])):
                 w.writerow((
-                    final_csv_raw_data[0][1][count].isoformat(), # format datetime as string
+                    # format datetime as string
+                    final_csv_raw_data[0][1][count].isoformat(),
                     final_csv_raw_data[0][2][count]
                 ))
                 yield data.getvalue()
@@ -185,7 +190,7 @@ def return_hydro_info(scenario_id):
             stream_with_context(generate()),
             mimetype='text/csv', headers=headers
         )
-        
+
 
 @api.route('/api/scenarios/metadata')
 def metadata_all_scenarios():
@@ -199,9 +204,10 @@ def metadata_all_scenarios():
 
     for temp_item in scenarios:
         # temp_item is class Scenario
-        final_list.append({'name':temp_item['name'],'_id':{'$oid':str(temp_item['id'])},'time_finished':str(temp_item['time_finished'])})
+        final_list.append({'name': temp_item['name'], '_id': {'$oid': str(
+            temp_item['id'])}, 'time_finished': str(temp_item['time_finished'])})
 
-    final_dict = {'scenarios':final_list}
+    final_dict = {'scenarios': final_list}
     return json.dumps(final_dict)
 
 
@@ -246,7 +252,7 @@ def scenarios():
         scenario_run.finalize_run()
 
         new_scenario = Scenario(
-            user_id = current_user.id,
+            user_id=current_user.id,
             name=name,
             time_received=time_received,
             veg_map_by_hru=get_veg_map_by_hru(scenario_run.scenario_file)
@@ -320,14 +326,16 @@ def get_user_access_token():
     '''
     return session['api_token']
 
+
 @api.route('/api/get_temperature')
 def get_temperature():
     '''
     This api get current user model run temperature as a json file
-    ''' 
+    '''
     app_root = find_user_folder()
     data_file = app_root + app.config['TEMP_DATA']
     return add_values_into_json(data_file)
+
 
 @api.route('/api/get_default_temperature')
 def get_default_temperature():
@@ -340,12 +348,12 @@ def get_default_temperature():
         os.mkdir(app_root)
 
     default_data_folder = app_root + '/../../data/'
-    #app.logger.debug(default_data_folder)
+    # app.logger.debug(default_data_folder)
     data_file = default_data_folder + app.config['DEFAULT_DATA']
-    #app.logger.debug(data_file)
+    # app.logger.debug(data_file)
 
     return add_values_into_json(data_file)
- 
+
 
 @api.route('/api/apply_modified_json_temperature', methods=['POST'])
 def apply_modified_temperature():
@@ -421,7 +429,7 @@ def _init_dev_db(BASE_PARAMETER_NC, scenario_num=0):
 
     new_scenario = Scenario(
         name=name,
-        user_id = current_user.id,
+        user_id=current_user.id,
         time_received=time_received,
         time_finished=time_finished,
         veg_map_by_hru=updated_veg_map_by_hru,
@@ -432,7 +440,30 @@ def _init_dev_db(BASE_PARAMETER_NC, scenario_num=0):
 
     new_scenario.save()
 
+# the function is basically from http://code.runnable.com/UiPcaBXaxGNYAAAL/how-to-upload-a-file-to-the-server-in-flask-for-python
+# Route that will process the file upload
+
+
+@api.route('/api/netCDF/upload', methods=['POST'])
+def upload():
+    # Get the name of the uploaded file
+    file = request.files['file']
+    # Check if the file is nc
+    if file and (file.filename.split('.')[-1] == 'nc'):
+        # Make the filename safe, remove unsupported chars
+        filename = secure_filename(file.filename)
+        # Move the file form the temporal folder to
+        # the upload folder we setup
+        app_root = find_user_folder()
+        file_location = app_root + app.config['TEMP_VIS'] + '/' + filename
+        file.save(file_location)
+        # TODO return the variable names in the
+        print get_nc_variable_name(file_location)
+        return 'success'
+
 # this part is used to test the session working or not
+
+
 @api.route('/api/test/user')
 def test_user():
     print current_user.is_authenticated()

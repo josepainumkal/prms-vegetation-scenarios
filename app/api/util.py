@@ -274,3 +274,22 @@ def add_values_into_netcdf(original_nc, post_data, update_file):
 
     
     fileHandle.close()
+
+# this function is used to get all the variable named
+# and the variable should have as many elements as the hru num
+def get_nc_variable_name(filename):
+    var_name_list = []
+    netcdf_aim_file = netCDF4.Dataset(filename,'r')
+    # TODO find a better way to get row and col
+    lat_num = netcdf_aim_file['lat'].shape[0]
+    lon_num = netcdf_aim_file['lon'].shape[0]
+    for temp_var in netcdf_aim_file.variables.values():
+        # check if the variable is the same size with hru map
+        if hasattr(temp_var,'shape'):
+            total_len = 1
+            for i in temp_var.shape:
+                total_len = total_len * i
+            # using this method to check if the size is the same with hru map 
+            if total_len%(lat_num*lon_num)==0:
+                var_name_list.append(temp_var.name)
+    return var_name_list
