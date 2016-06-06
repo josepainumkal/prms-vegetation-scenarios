@@ -455,11 +455,13 @@ def upload():
         # Move the file form the temporal folder to
         # the upload folder we setup
         app_root = find_user_folder()
-        file_location = app_root + app.config['TEMP_VIS'] + '/' + filename
+        if not os.path.exists(app_root):
+            os.mkdir(app_root)
+        file_location = app_root + app.config['TEMP_VIS']   
         file.save(file_location)
-        # TODO return the variable names in the select boxes
-        app.logger.debug(get_nc_variable_name(file_location))
-        return 'success'
+        #app.logger.debug(get_nc_variable_name(file_location))
+        param_list = get_nc_variable_name(file_location)
+        return render_template('vis_netcdf.html', param_list=param_list)
 
 # this part is used to test the session working or not
 

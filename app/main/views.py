@@ -46,3 +46,14 @@ def hydrograph_visualization(scenario_id=''):
     """
 
     return render_template('hydrograph_vis.html', scenario_id=scenario_id)
+
+
+@main.route('/vis_netcdf')
+@login_required
+@set_api_token
+def netcdf_visualization():
+    """
+    This function is for hydrograph visualization
+    """
+
+    return render_template('vis_upload_netcdf.html')

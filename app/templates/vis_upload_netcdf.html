@@ -26,8 +26,11 @@
     <div class="row">
 
       <div id='uploadfileDiv'>
-        <h4>Step 1) Choose a parameter from the upload netcdf file</h4>
-
+        <h4 style="color:red">Please upload a NetCDF file (extension ".nc")</h4>
+        <form action="/api/netCDF/upload" method="post" enctype="multipart/form-data">
+          <input type="file" name="file"><br /><br />
+          <input type="submit" value="Upload">
+        </form>
       </div>
 
     </div>
