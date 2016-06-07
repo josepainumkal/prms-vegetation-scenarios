@@ -15,7 +15,7 @@ import StringIO
 from werkzeug.datastructures import Headers
 from werkzeug.wrappers import Response
 from werkzeug import secure_filename
-from flask import jsonify, request, Response, make_response, stream_with_context
+from flask import jsonify, request, Response, make_response, stream_with_context, render_template
 from flask import current_app as app
 from urllib import urlretrieve
 from uuid import uuid4
@@ -23,7 +23,7 @@ from uuid import uuid4
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
 from flask import session
-from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name
+from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data
 from PRMSCoverageTool import ScenarioRun
 
 # import ssl
@@ -388,7 +388,7 @@ def hru_veg_json():
     if request.method == 'GET':
         """generate json file from netcdf file"""
 
-        BASE_PARAMETER_NC = find_user_folder() + '/temp_param.nc'
+        BASE_PARAMETER_NC = find_user_folder() + app.config['TEMP_PARAM']
 
         return jsonify(
             **json.loads(get_veg_map_by_hru(BASE_PARAMETER_NC).to_json())
@@ -440,12 +440,15 @@ def _init_dev_db(BASE_PARAMETER_NC, scenario_num=0):
 
     new_scenario.save()
 
-# the function is basically from http://code.runnable.com/UiPcaBXaxGNYAAAL/how-to-upload-a-file-to-the-server-in-flask-for-python
-# Route that will process the file upload
+
 
 
 @api.route('/api/netCDF/upload', methods=['POST'])
 def upload():
+    '''
+    the function is basically from http://code.runnable.com/UiPcaBXaxGNYAAAL/how-to-upload-a-file-to-the-server-in-flask-for-python
+    Route that will process the file upload
+    '''
     # Get the name of the uploaded file
     file = request.files['file']
     # Check if the file is nc
@@ -457,17 +460,30 @@ def upload():
         app_root = find_user_folder()
         if not os.path.exists(app_root):
             os.mkdir(app_root)
-        file_location = app_root + app.config['TEMP_VIS']   
+        file_location = app_root + app.config['TEMP_VIS']
         file.save(file_location)
         #app.logger.debug(get_nc_variable_name(file_location))
         param_list = get_nc_variable_name(file_location)
         return render_template('vis_netcdf.html', param_list=param_list)
 
-# this part is used to test the session working or not
+
+@api.route('/api/get_chosen_data_by_frame/<param_name>/<start_frame>/<end_frame>')
+def get_param_data_by_frame_num(param_name='',start_frame='',end_frame=''):
+    '''
+    this part is used to get
+    '''
+    app_root = find_user_folder()
+    file_location = app_root + app.config['TEMP_VIS']
+    return get_chosen_param_data(file_location,param_name,start_frame,end_frame)
+
+
 
 
 @api.route('/api/test/user')
 def test_user():
+    '''
+    this part is used to test the session working or not
+    '''
     print current_user.is_authenticated()
     print current_user.name
     return str(current_user.is_authenticated()) + current_user.email

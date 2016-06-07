@@ -292,4 +292,41 @@ def get_nc_variable_name(filename):
             # using this method to check if the size is the same with hru map 
             if total_len%(lat_num*lon_num)==0:
                 var_name_list.append(temp_var.name)
+    netcdf_aim_file.close()
     return var_name_list
+
+# this function is used to get the data
+# start frame starts from 0
+# end frame ends len-1
+def get_chosen_param_data(filename,param_name,start_frame,end_frame):
+    netcdf_aim_file = netCDF4.Dataset(filename,'r')
+    chosen_data_list = netcdf_aim_file[param_name]
+    if int(start_frame) < 0:
+        raise Exception("start frame number is less than 0")
+        return
+    elif int(end_frame)>=len(chosen_data_list):
+        raise Exception("end frame number is more than maximum")
+        return
+    elif int(end_frame)<int(start_frame):
+        raise Exception("end frame number is smaller than start frame number")
+        return
+    # TODO make it general use
+    # for current version the format of each chosen param is
+    # [framenum][lat][lon]
+    temp_list = chosen_data_list[int(start_frame):(int(end_frame)+1)].tolist()
+    # rows
+    lat_num = netcdf_aim_file['lat'].shape[0]
+    # cols
+    lon_num = netcdf_aim_file['lon'].shape[0]
+    
+    upload_data = { 
+              'row_num': lat_num, \
+              'col_num': lon_num, \
+              'param_data':temp_list, \
+              'start_frame': int(start_frame), \
+              'end_frame': int(end_frame) \
+           }
+
+    netcdf_aim_file.close()
+
+    return json.dumps(upload_data)

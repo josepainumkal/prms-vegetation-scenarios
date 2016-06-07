@@ -27,11 +27,13 @@
 
       <div id='uploadfileDiv'>
         <h4>Step 1) Choose a parameter from the upload netcdf file</h4>
-        <select id='paramSelect'>
+        <select class='selectpicker' id='paramSelect'>
           {% for i in param_list %}
             <option value={{ i }}>{{ i }}</option>
           {% endfor %}
         </select>
+
+        <button type='button' class='btn btn-success' id='confirmSelectBoxButtonID'>Confirm</button>
       </div>
 
     </div>
