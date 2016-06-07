@@ -27,18 +27,15 @@
 
       <div id='uploadfileDiv'>
         <h4>Step 1) Choose a parameter from the upload netcdf file</h4>
-
-        <div class="btn-group">
-          <button type="button" class="form-control btn btn-default dropdown-toggle" data-toggle="dropdown">
-              Select a Parameter <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu" role="menu" id='param_list_id'>
+        <p>
+          <select class="form-control" id='paramSelectBoxID'>
             {% for i in param_list %}
-              <li>{{ i }}</li>
+              <option value={{ i }}>{{ i }}</option>
             {% endfor %}
-          </ul>
-        </div>
-
+          </select>
+        </p>
+        <p><button type="button" class='btn btn-sm btn-sm-map' id='confirmButtonID'>Confirm</button></p>
+       
       </div>
 
     </div>

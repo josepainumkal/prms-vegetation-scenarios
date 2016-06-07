@@ -101,20 +101,19 @@ $(document).ready(function(){
   //   setInterval(updateCanvas, 10);
 
   // });
-  $('ul#param_list_id li').click(function(e) 
-  { 
-      var chosenParam = $(this).find("span.t").text();
-      alert(chosenParam);
+  $('#confirmTemperatureButton').on("click", function() {
+      var chosenParam = $( "#paramSelectBoxID" ).val();
       var metadataURL = '/api/get_chosen_metadata/'+chosenParam;
       var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/1/9';
+      console.log(metadataURL);
+      console.log(frameURL);
       $.get(metadataURL, function(metadata){
         // test if it is json
         var metadataJSON = metadata;
         $.get(frameURL, function(frameData){
           var b = frameData;
-        })
-      })
-
+        });
+      });
   });
 
   function obtainJsoninto1D(inputJson)

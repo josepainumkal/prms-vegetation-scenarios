@@ -349,13 +349,17 @@ def get_nc_meta_data(filename,param_name):
     '''
     netcdf_aim_file = netCDF4.Dataset(filename,'r')
     chosen_data_list = netcdf_aim_file[param_name]
+    param_max = numpy.amax(chosen_data_list[:])
+    param_min = numpy.amin(chosen_data_list[:])
     lat_num = netcdf_aim_file['lat'].shape[0]
     lon_num = netcdf_aim_file['lon'].shape[0]
     total_num = len(chosen_data_list)
     upload_data = { 
           'row_num': lat_num, \
           'col_num': lon_num, \
-          'total_num': total_num \
+          'total_num': total_num, \
+          'param_max': param_max, \
+          'param_min': param_min \
        }
     netcdf_aim_file.close()
     return json.dumps(upload_data)
