@@ -317,17 +317,9 @@ def get_chosen_param_data(filename,param_name,start_frame,end_frame):
     # for current version the format of each chosen param is
     # [framenum][lat][lon]
     temp_list = chosen_data_list[int(start_frame):(int(end_frame)+1)].tolist()
-    # rows
-    lat_num = netcdf_aim_file['lat'].shape[0]
-    # cols
-    lon_num = netcdf_aim_file['lon'].shape[0]
     
     upload_data = { 
-              'row_num': lat_num, \
-              'col_num': lon_num, \
-              'param_data':temp_list, \
-              'start_frame': int(start_frame), \
-              'end_frame': int(end_frame) \
+              'param_data':temp_list \
            }
 
     netcdf_aim_file.close()

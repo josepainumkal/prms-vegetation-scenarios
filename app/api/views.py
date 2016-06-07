@@ -479,6 +479,11 @@ def get_param_data_by_frame_num(param_name='',start_frame='',end_frame=''):
 
 @api.route('/api/get_chosen_data_stream/<param_name>')
 def stream_param_data(param_name=''):
+    '''
+    TODO
+    This part does not work for now
+    next() does not return next frame
+    '''
     app_root = find_user_folder()
     file_location = app_root + app.config['TEMP_VIS']
     return gen_nc_frame_by_frame(file_location,param_name).next()
@@ -490,7 +495,7 @@ def get_param_metadat(param_name=''):
     '''
     app_root = find_user_folder()
     file_location = app_root + app.config['TEMP_VIS']
-    return get_nc_meta_data(filename,param_name)
+    return get_nc_meta_data(file_location,param_name)
 
 
 @api.route('/api/test/user')

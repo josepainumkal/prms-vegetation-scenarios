@@ -106,7 +106,7 @@ $(document).ready(function(){
       var chosenParam = $(this).find("span.t").text();
       alert(chosenParam);
       var metadataURL = '/api/get_chosen_metadata/'+chosenParam;
-      var frameURL = '/api/get_chosen_data_stream/'+chosenParam;
+      var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/1/9';
       $.get(metadataURL, function(metadata){
         // test if it is json
         var metadataJSON = metadata;
