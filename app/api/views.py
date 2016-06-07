@@ -23,7 +23,7 @@ from uuid import uuid4
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
 from flask import session
-from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data
+from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data, gen_nc_frame_by_frame, get_nc_meta_data
 from PRMSCoverageTool import ScenarioRun
 
 # import ssl
@@ -448,6 +448,7 @@ def upload():
     '''
     the function is basically from http://code.runnable.com/UiPcaBXaxGNYAAAL/how-to-upload-a-file-to-the-server-in-flask-for-python
     Route that will process the file upload
+    # TODO upload file chunk by chunk, using this http://blog.pelicandd.com/article/80/streaming-input-and-output-in-flask
     '''
     # Get the name of the uploaded file
     file = request.files['file']
@@ -476,7 +477,20 @@ def get_param_data_by_frame_num(param_name='',start_frame='',end_frame=''):
     file_location = app_root + app.config['TEMP_VIS']
     return get_chosen_param_data(file_location,param_name,start_frame,end_frame)
 
+@api.route('/api/get_chosen_data_stream/<param_name>')
+def stream_param_data(param_name=''):
+    app_root = find_user_folder()
+    file_location = app_root + app.config['TEMP_VIS']
+    return gen_nc_frame_by_frame(file_location,param_name).next()
 
+@api.route('/api/get_chosen_metadata/<param_name>')
+def get_param_metadat(param_name=''):
+    '''
+    this function returns the metadata
+    '''
+    app_root = find_user_folder()
+    file_location = app_root + app.config['TEMP_VIS']
+    return get_nc_meta_data(filename,param_name)
 
 
 @api.route('/api/test/user')

@@ -295,10 +295,13 @@ def get_nc_variable_name(filename):
     netcdf_aim_file.close()
     return var_name_list
 
-# this function is used to get the data
-# start frame starts from 0
-# end frame ends len-1
+
 def get_chosen_param_data(filename,param_name,start_frame,end_frame):
+    '''
+    # this function is used to get the data
+    # start frame starts from 0
+    # end frame ends len-1
+    '''
     netcdf_aim_file = netCDF4.Dataset(filename,'r')
     chosen_data_list = netcdf_aim_file[param_name]
     if int(start_frame) < 0:
@@ -330,3 +333,38 @@ def get_chosen_param_data(filename,param_name,start_frame,end_frame):
     netcdf_aim_file.close()
 
     return json.dumps(upload_data)
+
+
+def gen_nc_frame_by_frame(filename,param_name):
+    '''
+    this function generates data frame by frame
+    '''
+    netcdf_aim_file = netCDF4.Dataset(filename,'r')
+    chosen_data_list = netcdf_aim_file[param_name]
+
+    for i in chosen_data_list[:]:
+        upload_data = { 
+              'param_data': i.tolist() \
+           }
+        yield json.dumps(upload_data)
+    # TODO if i close the file here, then it will have some errors
+    # need to study where to close the file
+    # netcdf_aim_file.close()
+
+def get_nc_meta_data(filename,param_name):
+    '''
+    return chosen param meta data
+    '''
+    netcdf_aim_file = netCDF4.Dataset(filename,'r')
+    chosen_data_list = netcdf_aim_file[param_name]
+    lat_num = netcdf_aim_file['lat'].shape[0]
+    lon_num = netcdf_aim_file['lon'].shape[0]
+    total_num = len(chosen_data_list)
+    upload_data = { 
+          'row_num': lat_num, \
+          'col_num': lon_num, \
+          'total_num': total_num \
+       }
+    netcdf_aim_file.close()
+    return json.dumps(upload_data)
+
