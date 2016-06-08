@@ -49,7 +49,12 @@ $(document).ready(function(){
   var paramMin;
   var paramMax;
 
-  var currentFrameNum = 0;
+  var chosenParam;
+  var currentLoadFrameNum = 0;
+  var frameBuffer = [];
+  var frameJSON;
+
+  var setIntervalID;
 
 
   // $.get('/fire_data', function(data){
@@ -108,12 +113,13 @@ $(document).ready(function(){
   // });
   
   $('#confirmParamButtonID').on("click", function() {
-      var chosenParam = $( "#paramSelectBoxID" ).val();
+      chosenParam = $( "#paramSelectBoxID" ).val();
       var metadataURL = '/api/get_chosen_metadata/'+chosenParam;
-      // init frame
-      var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/0/0';
-      console.log(metadataURL);
-      console.log(frameURL);
+      // init frame with the first 10 frames
+      var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/0/9';
+      var frameStep = 10;
+      // console.log(metadataURL);
+      // console.log(frameURL);
       $.get(metadataURL, function(metadata){
         // test if it is json
         var metadataJSON = JSON.parse(metadata);
@@ -133,23 +139,54 @@ $(document).ready(function(){
 
         canvasHandle = document.getElementById("myCanvas");
         canvas2DContext = canvasHandle.getContext("2d");
-
+        // initial frameJson
         $.get(frameURL, function(frameData){
-          var frameJSON = JSON.parse(frameData);
-
-          updateCanvas(frameJSON['param_data'][0]);
+          frameJSON = JSON.parse(frameData);
+          frameBuffer.push(frameJSON['param_data']);
+          // .shift get the array first element and remove it
+          if(frameBuffer.length != 0)
+          {
+            updateCanvas(frameBuffer.shift());
+          }
 
           $('#nextFrameID').on("click", function() {
-            currentFrameNum = currentFrameNum + 1;
-            frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentFrameNum.toString()+'/'+currentFrameNum.toString();
-            $.get(frameURL, function(frameData1){
-              frameJSON = JSON.parse(frameData1);
-              updateCanvas(frameJSON['param_data'][0]);
-            });
+            if(frameBuffer.length != 0)
+            {
+              updateCanvas(frameBuffer.shift());
+            }
           });
+
+          // keep pushing more frames into var frameJSON buffer
+          $('#playFrameID').on("click", function() {
+            // every 1 sec update frame
+            setIntervalID = setInterval(updateNextFrame, 1000);
+
+            $('#stopFrameID').on("click", function() {
+              clearInterval(setIntervalID);
+            });
+            
+          });
+
         });
+
       });
   });
+
+  
+  function updateNextFrame()
+  {
+    currentLoadFrameNum = currentLoadFrameNum + frameStep;
+    var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentLoadFrameNum.toString()+'/'+(currentLoadFrameNum+frameStep).toString();
+    $.get(frameURL, function(frameData){
+      frameJSON = JSON.parse(frameData);
+      frameBuffer.push(frameJSON['param_data']);
+    });
+    // check if buffer array is empty
+    if(frameBuffer.length != 0)
+    {
+      updateCanvas(frameBuffer.shift());
+    }
+  }
 
 
   function setupBackgroundMap()
