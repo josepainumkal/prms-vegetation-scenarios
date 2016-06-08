@@ -49,6 +49,8 @@ $(document).ready(function(){
   var paramMin;
   var paramMax;
 
+  var currentFrameNum = 0;
+
 
   // $.get('/fire_data', function(data){
   //   inputJson = JSON.parse(data);
@@ -108,7 +110,8 @@ $(document).ready(function(){
   $('#confirmParamButtonID').on("click", function() {
       var chosenParam = $( "#paramSelectBoxID" ).val();
       var metadataURL = '/api/get_chosen_metadata/'+chosenParam;
-      var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/1/9';
+      // init frame
+      var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/0/0';
       console.log(metadataURL);
       console.log(frameURL);
       $.get(metadataURL, function(metadata){
@@ -135,6 +138,15 @@ $(document).ready(function(){
           var frameJSON = JSON.parse(frameData);
 
           updateCanvas(frameJSON['param_data'][0]);
+
+          $('#nextFrameID').on("click", function() {
+            currentFrameNum = currentFrameNum + 1;
+            frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentFrameNum.toString()+'/'+currentFrameNum.toString();
+            $.get(frameURL, function(frameData1){
+              frameJSON = JSON.parse(frameData1);
+              updateCanvas(frameJSON['param_data'][0]);
+            });
+          });
         });
       });
   });
@@ -165,14 +177,14 @@ $(document).ready(function(){
   function updateCanvas(input2DArray)
   {
 
-      canvas2DContext.globalAlpha = 0.5;
+      //canvas2DContext.globalAlpha = 0.5;
 
       for(var m=0 ; m<dataY ; m++)
       {
         for(var i=0 ; i<dataX ; i++)
         {
 
-          canvas2DContext.fillStyle = colorScale[Math.floor(input2DArray[i][m]-paramMin)+1];
+          canvas2DContext.fillStyle = colorScale[Math.floor(input2DArray[m][i]-paramMin)+1];
           //                          start x,     y,            width,    height
           canvas2DContext.fillRect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
           // draw lines to separate cell
