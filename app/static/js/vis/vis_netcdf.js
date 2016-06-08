@@ -4,8 +4,8 @@ $(document).ready(function(){
   var inputJson;
 
   // set up the canvas size
-  var cellWidth = 1;
-  var cellHeight = 1;
+  var cellWidth = 10;
+  var cellHeight = 10;
 
   // canvas col and row num
   var dataX;
@@ -45,6 +45,9 @@ $(document).ready(function(){
 
   var backgroundMap = new Image();
   var canvasSize = [];
+
+  var paramMin;
+  var paramMax;
 
 
   // $.get('/fire_data', function(data){
@@ -101,7 +104,8 @@ $(document).ready(function(){
   //   setInterval(updateCanvas, 10);
 
   // });
-  $('#confirmTemperatureButton').on("click", function() {
+  
+  $('#confirmParamButtonID').on("click", function() {
       var chosenParam = $( "#paramSelectBoxID" ).val();
       var metadataURL = '/api/get_chosen_metadata/'+chosenParam;
       var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/1/9';
@@ -109,32 +113,39 @@ $(document).ready(function(){
       console.log(frameURL);
       $.get(metadataURL, function(metadata){
         // test if it is json
-        var metadataJSON = metadata;
+        var metadataJSON = JSON.parse(metadata);
+        paramMax = parseFloat(metadataJSON['param_max']);
+        paramMin = parseFloat(metadataJSON['param_min']);
+        var scaleSize = Math.floor(paramMax-paramMin)+1;
+        colorScale = chroma.scale(['white','black']).colors(scaleSize);
+
+        dataX = metadataJSON['col_num'];
+        dataY = metadataJSON['row_num'];
+
+        canvasWidth = cellWidth*dataX;
+        canvasHeight = cellHeight*dataY;
+
+        $('.mapCanvas').attr('width',canvasWidth.toString()+'px');
+        $('.mapCanvas').attr('height',canvasHeight.toString()+'px');
+
+        canvasHandle = document.getElementById("myCanvas");
+        canvas2DContext = canvasHandle.getContext("2d");
+
         $.get(frameURL, function(frameData){
-          var b = frameData;
+          var frameJSON = JSON.parse(frameData);
+
+          updateCanvas(frameJSON['param_data'][0]);
         });
       });
   });
 
-  function obtainJsoninto1D(inputJson)
-  {
-      var outputarr = [];
-      for(var m=0 ; m<dataY ; m++)
-      {
-        for(var i=0 ; i<dataX ; i++)
-        {
-          outputarr.push(inputJson["fire_data"][m][i]);
-        }
-      }
-      return outputarr;
-  }
 
   function setupBackgroundMap()
   {
-    backgroundMap.onload = function(){
-      canvas2DContext.globalAlpha = 1.0;
-      canvas2DContext.drawImage(backgroundMap, 0, 0);
-    }
+    // backgroundMap.onload = function(){
+    //   canvas2DContext.globalAlpha = 1.0;
+    //   canvas2DContext.drawImage(backgroundMap, 0, 0);
+    // }
     
   }
 
@@ -151,7 +162,7 @@ $(document).ready(function(){
 
 
   // this function is used to update canvas (fire cell) with the current fire code
-  function updateCanvas()
+  function updateCanvas(input2DArray)
   {
 
       canvas2DContext.globalAlpha = 0.5;
@@ -160,46 +171,38 @@ $(document).ready(function(){
       {
         for(var i=0 ; i<dataX ; i++)
         {
-          if(currentTime == fireCurrent[i+m*dataX])
-          {
-            canvas2DContext.fillStyle = colorScale[1];
-            //                          start x,     y,            width,    height
-            canvas2DContext.fillRect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
-            // draw lines to separate cell
-            //canvas2DContext.rect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
-          }
-        }
-      }
-      //canvas2DContext.stroke();
-      currentTime = currentTime + 1;
 
-      setupBackgroundMap();
-
-      // update google map overlay
-      // need to set up some intervals or the refresh rate to fast and the google map cannot follow up
-      // if(currentTime%100 == 0)
-      // {
-      //   updateMapOverlay();
-      // }
-      //updateMapOverlay();
-  }
-  function initCanvas()
-  {
-      canvas2DContext.globalAlpha = 0.5;
-      for(var m=0 ; m<dataY ; m++)
-      {
-        for(var i=0 ; i<dataX ; i++)
-        {
-          canvas2DContext.fillStyle = colorScale[0];
+          canvas2DContext.fillStyle = colorScale[Math.floor(input2DArray[i][m]-paramMin)+1];
           //                          start x,     y,            width,    height
           canvas2DContext.fillRect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
           // draw lines to separate cell
-          //canvas2DContext.rect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
+          canvas2DContext.rect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
+          
         }
       }
-      //canvas2DContext.stroke();
-      setupBackgroundMap();
+      canvas2DContext.stroke();
+      // currentTime = currentTime + 1;
+
+      // setupBackgroundMap();
+
   }
+  // function initCanvas()
+  // {
+  //     //canvas2DContext.globalAlpha = 0.5;
+  //     for(var m=0 ; m<dataY ; m++)
+  //     {
+  //       for(var i=0 ; i<dataX ; i++)
+  //       {
+  //         canvas2DContext.fillStyle = colorScale[0];
+  //         //                          start x,     y,            width,    height
+  //         canvas2DContext.fillRect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
+  //         // draw lines to separate cell
+  //         //canvas2DContext.rect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
+  //       }
+  //     }
+  //     //canvas2DContext.stroke();
+  //     setupBackgroundMap();
+  // }
 
   Array.prototype.max = function() {
     return Math.max.apply(null, this);

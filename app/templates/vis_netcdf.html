@@ -7,7 +7,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
     <!-- I use Google Chart for this project -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="/static/js/vis/hydrograph_vis.js"></script>
+    <script type="text/javascript" src="/static/bower_components/chroma-js/chroma.min.js"></script>
+    <script type="text/javascript" src="/static/js/vis/vis_netcdf.js"></script>
 
     <style> /* set the local CSS */
       div.metaData
@@ -34,8 +35,14 @@
             {% endfor %}
           </select>
         </p>
-        <p><button type="button" class='btn btn-sm btn-sm-map' id='confirmButtonID'>Confirm</button></p>
+        <p><button type="button" class='btn btn-sm btn-sm-map' id='confirmParamButtonID'>Confirm</button></p>
        
+      </div>
+
+      <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
+            <canvas class='mapCanvas' id="myCanvas" style="border:1px solid #c3c3c3;" >
+              Your browser does not support the HTML5 canvas tag.
+            </canvas>
       </div>
 
     </div>
