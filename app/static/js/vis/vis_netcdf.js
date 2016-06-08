@@ -149,24 +149,24 @@ $(document).ready(function(){
             updateCanvas(frameBuffer.shift());
           }
 
-          $('#nextFrameID').on("click", function() {
+        });
+
+        $('#nextFrameID').on("click", function() {
             if(frameBuffer.length != 0)
             {
               updateCanvas(frameBuffer.shift());
             }
+        });
+
+        // keep pushing more frames into var frameJSON buffer
+        $('#playFrameID').on("click", function() {
+          // every 1 sec update frame
+          setIntervalID = setInterval(updateNextFrame, 1000);
+
+          $('#stopFrameID').on("click", function() {
+            clearInterval(setIntervalID);
           });
-
-          // keep pushing more frames into var frameJSON buffer
-          $('#playFrameID').on("click", function() {
-            // every 1 sec update frame
-            setIntervalID = setInterval(updateNextFrame, 1000);
-
-            $('#stopFrameID').on("click", function() {
-              clearInterval(setIntervalID);
-            });
-            
-          });
-
+          
         });
 
       });
