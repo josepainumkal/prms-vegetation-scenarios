@@ -53,8 +53,12 @@ $(document).ready(function(){
   var currentLoadFrameNum = 0;
   var frameBuffer = [];
   var frameJSON;
+  var totalFrameNum;
 
   var setIntervalID;
+  var frameStep;
+
+  var currentFrameNum;
 
 
   // $.get('/fire_data', function(data){
@@ -117,12 +121,15 @@ $(document).ready(function(){
       var metadataURL = '/api/get_chosen_metadata/'+chosenParam;
       // init frame with the first 10 frames
       var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/0/9';
-      var frameStep = 10;
+      frameStep = 10;
+      frameBuffer = [];
+      currentFrameNum = 0;
       // console.log(metadataURL);
       // console.log(frameURL);
       $.get(metadataURL, function(metadata){
         // test if it is json
         var metadataJSON = JSON.parse(metadata);
+        totalFrameNum = parseFloat(metadataJSON['total_num']);
         paramMax = parseFloat(metadataJSON['param_max']);
         paramMin = parseFloat(metadataJSON['param_min']);
         var scaleSize = Math.floor(paramMax-paramMin)+1;
@@ -142,7 +149,8 @@ $(document).ready(function(){
         // initial frameJson
         $.get(frameURL, function(frameData){
           frameJSON = JSON.parse(frameData);
-          frameBuffer.push(frameJSON['param_data']);
+          // combine two arrays
+          frameBuffer = frameBuffer.concat(frameJSON['param_data']);
           // .shift get the array first element and remove it
           if(frameBuffer.length != 0)
           {
@@ -175,12 +183,26 @@ $(document).ready(function(){
   
   function updateNextFrame()
   {
-    currentLoadFrameNum = currentLoadFrameNum + frameStep;
-    var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentLoadFrameNum.toString()+'/'+(currentLoadFrameNum+frameStep).toString();
-    $.get(frameURL, function(frameData){
-      frameJSON = JSON.parse(frameData);
-      frameBuffer.push(frameJSON['param_data']);
-    });
+    if(totalFrameNum>(currentLoadFrameNum+frameStep))
+    {
+      var frameURL;
+      currentLoadFrameNum = currentLoadFrameNum + frameStep;
+      if(totalFrameNum>(currentLoadFrameNum+frameStep))
+      {
+        frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentLoadFrameNum.toString()+'/'+(currentLoadFrameNum+frameStep).toString();
+      }
+      else
+      {
+        frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentLoadFrameNum.toString()+'/'+totalFrameNum.toString();  
+      }
+      
+      $.get(frameURL, function(frameData){
+        frameJSON = JSON.parse(frameData);
+        frameBuffer = frameBuffer.concat(frameJSON['param_data']);
+        //frameBuffer.push(frameJSON['param_data']);
+      });
+    }
+    
     // check if buffer array is empty
     if(frameBuffer.length != 0)
     {
@@ -213,7 +235,8 @@ $(document).ready(function(){
   // this function is used to update canvas (fire cell) with the current fire code
   function updateCanvas(input2DArray)
   {
-
+      $( "#frameParagraphID" ).text('This is frame'+currentFrameNum.toString());
+      currentFrameNum = currentFrameNum + 1;
       //canvas2DContext.globalAlpha = 0.5;
 
       for(var m=0 ; m<dataY ; m++)
