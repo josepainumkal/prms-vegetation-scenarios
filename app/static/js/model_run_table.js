@@ -107,6 +107,7 @@ $(document).ready(function(){
 				var tempItem = data.objects[i];
 				$('#model-run-items').append("<tr key="+tempItem.id.toString()+">" +
 												 "<td>"+tempItem.id.toString()+"</td>" +
+												 "<td>"+tempItem.title+"</td>" +
 												 "<td>"+tempItem.created_at+"</td>" +
 												 // the button id is modelrunID
 												 "<td><button class='modelRunChosenButton' id='"+tempItem.id.toString()+"' >Choose Me</button>"+"</td>" +
@@ -124,6 +125,7 @@ $(document).ready(function(){
 				},
 				success: function(data) {
 					$('#model-run-items').append("<tr key="+(-1).toString()+">" +
+													 "<td>default</td>" +
 													 "<td>default</td>" +
 													 "<td>default</td>" +												 
 													 "<td><button class='modelRunChosenButton' id='"+(-1).toString()+"' >Choose Me</button>"+"</td>" +
