@@ -312,6 +312,8 @@ def scenarios():
         new_scenario.hydrograph = hydrograph
 
         new_scenario.save()
+        
+        # TODO rename animation file with the id
 
         # clean up temporary statsvar netCDF
         d.close()

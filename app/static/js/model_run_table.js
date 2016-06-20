@@ -178,6 +178,7 @@ $(document).ready(function(){
 		var controlURL;
 		var dataURL;
 		var paramURL;
+		var animationURL;
 		for(var i=0; i<data.resources.length; i++) 
 		{
 			// for current version I only list the three input files
@@ -193,6 +194,10 @@ $(document).ready(function(){
 			{
 				paramURL = data.resources[i].resource_url;
 			}
+			else if(data.resources[i].resource_type == 'animation')
+			{
+				animationURL = data.resources[i].resource_url;
+			}
 		}
 
 		// need to replace all the / with +++ in the url
@@ -200,8 +205,9 @@ $(document).ready(function(){
 		controlURL = controlURL.replace(/\//g,'+++');
 		dataURL = dataURL.replace(/\//g,'+++');
 		paramURL = paramURL.replace(/\//g,'+++');
+		animationURL = animationURL.replace(/\//g,'+++');
 		// separate url by ---
-		var url_info = controlURL + '---' + dataURL + '---' + paramURL;
+		var url_info = controlURL + '---' + dataURL + '---' + paramURL + '---' + animationURL;
         $.ajax({
 		    type : "GET",
 		    url : "/api/scenarios/download_input_files/" + url_info,
