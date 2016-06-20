@@ -109,6 +109,9 @@ class Scenario(db.Document):
 
     hydrograph = db.EmbeddedDocumentField('Hydrograph')
 
+    def get_id(self):
+        return str(self.pk)
+
     def to_json(self):
         """
         Override db.Document's to_json for custom date fomratting

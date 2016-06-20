@@ -23,7 +23,7 @@ from uuid import uuid4
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
 from flask import session
-from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data, gen_nc_frame_by_frame, get_nc_meta_data
+from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data, gen_nc_frame_by_frame, get_nc_meta_data, download_prms_outputs
 from PRMSCoverageTool import ScenarioRun
 
 # import ssl
@@ -124,10 +124,9 @@ def download_model_inputs(url_info):
     # app.logger.debug(data_url)
     param_url = url_list[2].replace('+++', '/')
     #app.logger.debug(param_url)
-    animation_url = url_list[3].replace('+++', '/')
     #app.logger.debug('test here')
     # use the following function to download the three input files
-    download_prms_inputs(control_url, data_url, param_url, animation_url)
+    download_prms_inputs(control_url, data_url, param_url)
     return 'success'
 
 
@@ -232,6 +231,8 @@ def scenarios():
 
         name = request.json['name']
 
+        animation_url = request.json['animation_url']
+
         time_received = datetime.datetime.now()
 
         # XXX FIXME XXX
@@ -312,8 +313,9 @@ def scenarios():
         new_scenario.hydrograph = hydrograph
 
         new_scenario.save()
-        
-        # TODO rename animation file with the id
+
+        # download animation file here
+        download_prms_outputs(animation_url, new_scenario.get_id())
 
         # clean up temporary statsvar netCDF
         d.close()
@@ -470,8 +472,8 @@ def upload():
         param_list = get_nc_variable_name(file_location)
         return render_template('vis_netcdf.html', param_list=param_list)
 
-@api.route('/api/netCDF_url', methods=['POST'])
-def download_nc():
+@api.route('/api/netCDF_url/<animation_id>', methods=['POST'])
+def download_nc(animation_id=''):
     '''
     the function is used to get the nc file based on url and return
     param list in the nc file
@@ -481,7 +483,7 @@ def download_nc():
     app_root = find_user_folder()
     if not os.path.exists(app_root):
         os.mkdir(app_root)
-    file_location = app_root + app.config['TEMP_VIS']
+    file_location = app_root + app.config['TEMP_VIS'] + animation_id
     file.save(file_location)
     #app.logger.debug(get_nc_variable_name(file_location))
     param_list = get_nc_variable_name(file_location)

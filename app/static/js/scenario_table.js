@@ -67,9 +67,10 @@ $(document).ready(function(){
 	        }
 
 	        var visAnimation = function(tempScenario) {
+
 	      		$.ajax({
 	        		type : "POST",
-		    		url : "/api/netCDF_url",
+		    		url : "/api/netCDF_url/" + tempScenario._id.$oid,
 		    		data: JSON.stringify(
 		           	{
 		              id: tempScenario._id.$oid

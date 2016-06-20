@@ -70,6 +70,8 @@ $(document).ready(function(){
 	// this record how many model runs current user has
 	var itemCount;
 
+	var animationURL;
+
 	$.get('/api/access_token', function(token){
 		access_token = token;
 
@@ -178,7 +180,7 @@ $(document).ready(function(){
 		var controlURL;
 		var dataURL;
 		var paramURL;
-		var animationURL;
+		
 		for(var i=0; i<data.resources.length; i++) 
 		{
 			// for current version I only list the three input files
@@ -207,7 +209,7 @@ $(document).ready(function(){
 		paramURL = paramURL.replace(/\//g,'+++');
 		animationURL = animationURL.replace(/\//g,'+++');
 		// separate url by ---
-		var url_info = controlURL + '---' + dataURL + '---' + paramURL + '---' + animationURL;
+		var url_info = controlURL + '---' + dataURL + '---' + paramURL;
         $.ajax({
 		    type : "GET",
 		    url : "/api/scenarios/download_input_files/" + url_info,
@@ -373,7 +375,8 @@ $(document).ready(function(){
 	          data: JSON.stringify(
 	            {
 	              veg_map_by_hru: inputJson,
-	              name: scenarioName
+	              name: scenarioName,
+	              animation_url: animationURL
 	            }, null, '\t'),
 	          contentType: 'application/json',
 	          success: function(result) {

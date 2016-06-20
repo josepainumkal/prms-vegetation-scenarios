@@ -150,7 +150,7 @@ def use_default_model_run():
                     app.config['DEFAULT_PARAM'], param_file)
 
 
-def download_prms_inputs(control_url, data_url, param_url, animation_url):
+def download_prms_inputs(control_url, data_url, param_url):
     app_root = find_user_folder()
 
     if not os.path.exists(app_root):
@@ -160,7 +160,6 @@ def download_prms_inputs(control_url, data_url, param_url, animation_url):
     data_file = app_root + app.config['TEMP_DATA']
     control_file = app_root + app.config['TEMP_CONTROL']
     param_file = app_root + app.config['TEMP_PARAM']
-    animation_file = app_root + app.config['TEMP_VIS']
 
     # clean up previous download file
     if os.path.isfile(data_file):
@@ -172,19 +171,36 @@ def download_prms_inputs(control_url, data_url, param_url, animation_url):
     if os.path.isfile(param_file):
         os.remove(param_file)
 
-    if os.path.isfile(animation_file):
-        os.remove(animation_file)
-
     # download three inputs file based on the urls
     urllib.urlretrieve(control_url, control_file)
     urllib.urlretrieve(data_url, data_file)
     urllib.urlretrieve(param_url, param_file)
-    urllib.urlretrieve(animation_url, animation_file)
+
 
     app.logger.debug(
         'User: ' + current_user.email + ' finished downloading three input files')
 
+def download_prms_outputs(animation_url, animation_id):
+    '''
+    current version only download animation file
+    '''
+    app_root = find_user_folder()
 
+    if not os.path.exists(app_root):
+        os.mkdir(app_root)
+
+    # TODO clean the previous download input files
+    animation_file = app_root + app.config['TEMP_VIS'] + animation_id
+
+    # clean up previous download file
+    if os.path.isfile(animation_file):
+        os.remove(animation_file)
+
+    # download three inputs file based on the urls
+    urllib.urlretrieve(animation_url, animation_file)
+
+    app.logger.debug(
+        'User: ' + current_user.email + ' finished downloading animation file')
 
 # lisa's function, grab temperature from data.nc
 # Rui modified it a little bit to fit current version program
