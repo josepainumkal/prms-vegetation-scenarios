@@ -314,6 +314,7 @@ def scenarios():
 
         new_scenario.save()
 
+        # app.logger.debug('start download animation here')
         # download animation file here
         download_prms_outputs(animation_url, new_scenario.get_id())
 
@@ -472,7 +473,7 @@ def upload():
         param_list = get_nc_variable_name(file_location)
         return render_template('vis_netcdf.html', param_list=param_list)
 
-@api.route('/api/netCDF_url/<animation_id>', methods=['POST'])
+@api.route('/api/netCDF_url/<animation_id>')
 def download_nc(animation_id=''):
     '''
     the function is used to get the nc file based on url and return
@@ -484,39 +485,39 @@ def download_nc(animation_id=''):
     if not os.path.exists(app_root):
         os.mkdir(app_root)
     file_location = app_root + app.config['TEMP_VIS'] + animation_id
-    file.save(file_location)
+    # file.save(file_location)
     #app.logger.debug(get_nc_variable_name(file_location))
     param_list = get_nc_variable_name(file_location)
-    return render_template('vis_netcdf.html', param_list=param_list)
+    return render_template('vis_netcdf.html', param_list=param_list, scenario_id=animation_id)
 
 
-@api.route('/api/get_chosen_data_by_frame/<param_name>/<start_frame>/<end_frame>')
-def get_param_data_by_frame_num(param_name='',start_frame='',end_frame=''):
+@api.route('/api/get_chosen_data_by_frame/<param_name>/<start_frame>/<end_frame>/<scenario_id>')
+def get_param_data_by_frame_num(param_name='',start_frame='',end_frame='',scenario_id=''):
     '''
     this part is used to get
     '''
     app_root = find_user_folder()
-    file_location = app_root + app.config['TEMP_VIS']
+    file_location = app_root + app.config['TEMP_VIS'] + scenario_id
     return get_chosen_param_data(file_location,param_name,start_frame,end_frame)
 
-@api.route('/api/get_chosen_data_stream/<param_name>')
-def stream_param_data(param_name=''):
+@api.route('/api/get_chosen_data_stream/<param_name>/<scenario_id>')
+def stream_param_data(param_name='',scenario_id=''):
     '''
     TODO
     This part does not work for now
     next() does not return next frame
     '''
     app_root = find_user_folder()
-    file_location = app_root + app.config['TEMP_VIS']
+    file_location = app_root + app.config['TEMP_VIS'] + scenario_id
     return gen_nc_frame_by_frame(file_location,param_name).next()
 
-@api.route('/api/get_chosen_metadata/<param_name>')
-def get_param_metadat(param_name=''):
+@api.route('/api/get_chosen_metadata/<param_name>/<scenario_id>')
+def get_param_metadat(param_name='',scenario_id=''):
     '''
     this function returns the metadata
     '''
     app_root = find_user_folder()
-    file_location = app_root + app.config['TEMP_VIS']
+    file_location = app_root + app.config['TEMP_VIS'] + scenario_id
     return get_nc_meta_data(file_location,param_name)
 
 

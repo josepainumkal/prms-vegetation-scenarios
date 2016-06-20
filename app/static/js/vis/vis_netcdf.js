@@ -59,12 +59,14 @@ $(document).ready(function(){
   var frameStep;
 
   var currentFrameNum;
+
+  var scenarioID = $('#scenarioIDParagraph').text();
   
   $('#confirmParamButtonID').on("click", function() {
       chosenParam = $( "#paramSelectBoxID" ).val();
       var metadataURL = '/api/get_chosen_metadata/'+chosenParam;
       // init frame with the first 10 frames
-      var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/0/9';
+      var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/0/9/'+scenarioID;
       frameStep = 10;
       frameBuffer = [];
       currentFrameNum = 0;

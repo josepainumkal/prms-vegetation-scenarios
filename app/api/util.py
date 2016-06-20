@@ -196,6 +196,9 @@ def download_prms_outputs(animation_url, animation_id):
     if os.path.isfile(animation_file):
         os.remove(animation_file)
 
+    # retrieve url
+    animation_url = animation_url.replace('+++', '/')
+
     # download three inputs file based on the urls
     urllib.urlretrieve(animation_url, animation_file)
 
