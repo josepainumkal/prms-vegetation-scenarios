@@ -66,6 +66,21 @@ $(document).ready(function(){
 	        	window.open(downloadURL);
 	        }
 
+	        var visAnimation = function(tempScenario) {
+	      		$.ajax({
+	        		type : "POST",
+		    		url : "/api/netCDF_url",
+		    		data: JSON.stringify(
+		           	{
+		              id: tempScenario._id.$oid
+		            }, null, '\t'),
+		    		contentType: 'application/json',
+		            success: function(result) {
+		  		      
+		            }
+		        });
+	        }
+
 	        var deleteScenario = function(sc) {
 	          $.ajax({
 	              method: 'DELETE',
@@ -98,6 +113,13 @@ $(document).ready(function(){
 	                      </div>
 	                    </td>
 
+	                    <td className="download-link">
+	                        <a onClick={visAnimation.bind(this,scenario)}>
+	                          Visualize Animation File
+	                        </a>
+	                    </td>
+
+
 	                    <td>
 	                      <div className="delete-scenario" id={"delete-"+scenario._id.$oid}>
 	                        <span className="glyphicon glyphicon-trash"
@@ -120,6 +142,7 @@ $(document).ready(function(){
 	                            <td><strong>Time Finished</strong></td>
 	                            <td className="download-link"><strong>View Hydrograph</strong></td>
 	                            <td className="download-link"><strong>Download Hydrograph CSV File</strong></td>
+	                            <td className="download-link"><strong>Visualize Animation File</strong></td>
 	                            <td><strong>Delete Scenario</strong></td>
 	                        </tr>
 	                    </thead>

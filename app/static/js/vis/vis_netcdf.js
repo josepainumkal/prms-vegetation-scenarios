@@ -59,62 +59,6 @@ $(document).ready(function(){
   var frameStep;
 
   var currentFrameNum;
-
-
-  // $.get('/fire_data', function(data){
-  //   inputJson = JSON.parse(data);
-
-  //   // grab col and row num
-  //   dataX = inputJson['num_cols'];
-  //   dataY = inputJson['num_rows'];
-  //   // convert the json file into 1d, this is because my previous functions are
-  //   // designed for 1d only
-  //   fireOrigin = obtainJsoninto1D(inputJson);
-
-  //   var maxTime = inputJson['max_val'];
-  //   var notsetfireVal = inputJson['notsetfire_Val'];
-
-
-  //   // // should not use var fireCurrent = fireOrigin
-  //   // // coz when we change fireCurrent and then fireOrigin will change too
-  //   fireCurrent = fireOrigin.slice();
-
-  //   canvasWidth = cellWidth*dataX;
-  //   canvasHeight = cellHeight*dataY;
-
-  //   canvasSize.push(canvasWidth);
-  //   canvasSize.push(canvasHeight);
-   
-  //   $('.mapCanvas').attr('width',canvasWidth.toString()+'px');
-  //   $('.mapCanvas').attr('height',canvasHeight.toString()+'px');
-
-  //   // place mapArray into canvas
-  //   canvasHandle = document.getElementById("myCanvas");
-  //   canvas2DContext = canvasHandle.getContext("2d");
-
-  //   // for current version, we only have on fire and not on fire
-  //   // var scaleSize = 2;
-  //   // colorScale = chroma.scale(['green','red']).colors(scaleSize);
-  //   colorScale = ['#00FF00','#FF0000'];
-
-  //   // init map
-  //   var xllcorner = parseFloat(inputJson['let_top_lat']);
-  //   var xurcorner = parseFloat(inputJson['right_bottom_lat']);
-  //   var yllcorner = parseFloat(inputJson['right_bottom_long']);
-  //   var yurcorner = parseFloat(inputJson['left_top_long']);
-  //   center = [(xllcorner+xurcorner)/2,(yllcorner+yurcorner)/2];
-
-  //   center = [39.5401289,-119.81453920000001];
-
-  //   var google_tile = "http://maps.google.com/maps/api/staticmap?sensor=false&center=-30.397,150.644&zoom=8&size="+canvasSize[0].toString()+"x"+canvasSize[1].toString();
-  //   var google_tile = "http://maps.google.com/maps/api/staticmap?sensor=false&center=-30.397,150.644&zoom=8&size=906x642";
-  //   backgroundMap.src = google_tile;
-
-  //   //setupBackgroundMap();
-  //   initCanvas();
-  //   setInterval(updateCanvas, 10);
-
-  // });
   
   $('#confirmParamButtonID').on("click", function() {
       chosenParam = $( "#paramSelectBoxID" ).val();
@@ -258,23 +202,7 @@ $(document).ready(function(){
       // setupBackgroundMap();
 
   }
-  // function initCanvas()
-  // {
-  //     //canvas2DContext.globalAlpha = 0.5;
-  //     for(var m=0 ; m<dataY ; m++)
-  //     {
-  //       for(var i=0 ; i<dataX ; i++)
-  //       {
-  //         canvas2DContext.fillStyle = colorScale[0];
-  //         //                          start x,     y,            width,    height
-  //         canvas2DContext.fillRect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
-  //         // draw lines to separate cell
-  //         //canvas2DContext.rect(cellWidth*i,cellHeight*m,cellWidth,cellHeight);
-  //       }
-  //     }
-  //     //canvas2DContext.stroke();
-  //     setupBackgroundMap();
-  // }
+
 
   Array.prototype.max = function() {
     return Math.max.apply(null, this);

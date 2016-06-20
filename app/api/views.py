@@ -124,9 +124,10 @@ def download_model_inputs(url_info):
     # app.logger.debug(data_url)
     param_url = url_list[2].replace('+++', '/')
     #app.logger.debug(param_url)
+    animation_url = url_list[3].replace('+++', '/')
     #app.logger.debug('test here')
     # use the following function to download the three input files
-    download_prms_inputs(control_url, data_url, param_url)
+    download_prms_inputs(control_url, data_url, param_url, animation_url)
     return 'success'
 
 
@@ -466,6 +467,23 @@ def upload():
         #app.logger.debug(get_nc_variable_name(file_location))
         param_list = get_nc_variable_name(file_location)
         return render_template('vis_netcdf.html', param_list=param_list)
+
+@api.route('/api/netCDF_url', methods=['POST'])
+def download_nc():
+    '''
+    the function is used to get the nc file based on url and return
+    param list in the nc file
+    TODO I should pass some useful information from post request and then
+    dynamically get files in this step
+    '''
+    app_root = find_user_folder()
+    if not os.path.exists(app_root):
+        os.mkdir(app_root)
+    file_location = app_root + app.config['TEMP_VIS']
+    file.save(file_location)
+    #app.logger.debug(get_nc_variable_name(file_location))
+    param_list = get_nc_variable_name(file_location)
+    return render_template('vis_netcdf.html', param_list=param_list)
 
 
 @api.route('/api/get_chosen_data_by_frame/<param_name>/<start_frame>/<end_frame>')
