@@ -64,7 +64,7 @@ $(document).ready(function(){
   
   $('#confirmParamButtonID').on("click", function() {
       chosenParam = $( "#paramSelectBoxID" ).val();
-      var metadataURL = '/api/get_chosen_metadata/'+chosenParam;
+      var metadataURL = '/api/get_chosen_metadata/'+chosenParam+'/'+scenarioID;
       // init frame with the first 10 frames
       var frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/0/9/'+scenarioID;
       frameStep = 10;
@@ -135,11 +135,11 @@ $(document).ready(function(){
       currentLoadFrameNum = currentLoadFrameNum + frameStep;
       if(totalFrameNum>(currentLoadFrameNum+frameStep))
       {
-        frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentLoadFrameNum.toString()+'/'+(currentLoadFrameNum+frameStep).toString();
+        frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentLoadFrameNum.toString()+'/'+(currentLoadFrameNum+frameStep).toString()+'/'+scenarioID;
       }
       else
       {
-        frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentLoadFrameNum.toString()+'/'+totalFrameNum.toString();  
+        frameURL = '/api/get_chosen_data_by_frame/'+chosenParam+'/'+currentLoadFrameNum.toString()+'/'+totalFrameNum.toString()+'/'+scenarioID;  
       }
       
       $.get(frameURL, function(frameData){
