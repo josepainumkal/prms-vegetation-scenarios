@@ -68,7 +68,7 @@ class Config:
     TEMP_VIS = '/vis.nc'
 
     DEFAULT_DATA = '/LC.data.nc'
-    DEFAULT_CONTROL = '/LC.control'
+    DEFAULT_CONTROL = '/LC.anim.control'
     DEFAULT_PARAM = '/LC.param.nc'
 
 
