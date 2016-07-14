@@ -230,8 +230,10 @@ def scenarios():
         vegmap_json = request.json['veg_map_by_hru']
 
         name = request.json['name']
-
-        animation_url = request.json['animation_url']
+        has_anim = False
+        if 'animation_url' in request.json.keys():
+            animation_url = request.json['animation_url']
+            has_anim = True
 
         time_received = datetime.datetime.now()
 
@@ -316,7 +318,8 @@ def scenarios():
 
         # app.logger.debug('start download animation here')
         # download animation file here
-        download_prms_outputs(animation_url, new_scenario.get_id())
+        if has_anim:
+            download_prms_outputs(animation_url, new_scenario.get_id())
 
         # clean up temporary statsvar netCDF
         d.close()

@@ -79,7 +79,7 @@ $(document).ready(function(){
         paramMax = parseFloat(metadataJSON['param_max']);
         paramMin = parseFloat(metadataJSON['param_min']);
         var scaleSize = Math.floor(paramMax-paramMin)+1;
-        colorScale = chroma.scale(['white','black']).colors(scaleSize);
+        colorScale = chroma.scale(['blue','red']).colors(scaleSize);
 
         dataX = metadataJSON['col_num'];
         dataY = metadataJSON['row_num'];
@@ -181,7 +181,7 @@ $(document).ready(function(){
   // this function is used to update canvas (fire cell) with the current fire code
   function updateCanvas(input2DArray)
   {
-      $( "#frameParagraphID" ).text('This is frame'+currentFrameNum.toString());
+      $( "#frameParagraphID" ).text('This is day '+currentFrameNum.toString());
       currentFrameNum = currentFrameNum + 1;
       //canvas2DContext.globalAlpha = 0.5;
 
