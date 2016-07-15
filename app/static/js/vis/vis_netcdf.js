@@ -80,6 +80,21 @@ $(document).ready(function(){
         paramMin = parseFloat(metadataJSON['param_min']);
         var scaleSize = Math.floor(paramMax-paramMin)+1;
         colorScale = chroma.scale(['blue','red']).colors(scaleSize);
+        // add legend squares here
+        $('.legendCanvas').attr('width',canvasWidth.toString()+'px');
+        $('.legendCanvas').attr('height',cellHeight);
+        var tempCanvasHandle = document.getElementById("legendCanvas");
+        var tempCanvas2DContext = tempCanvasHandle.getContext("2d");
+        for(var i=0; i<dataX; i++)
+        {
+          tempCanvas2DContext.fillStyle = colorScale[parseInt(scaleSize*i/dataX)];
+          tempCanvas2DContext.fillRect(cellWidth*i,cellHeight,cellWidth,cellHeight);
+          tempCanvas2DContext.rect(cellWidth*i,cellHeight,cellWidth,cellHeight);
+        }
+        tempCanvas2DContext.stroke();
+
+        $('#legendExplainID').append('min (all the frames) is: '+paramMin.toString()+'; max (all the frames) is: '+paramMax.toString());
+
 
         dataX = metadataJSON['col_num'];
         dataY = metadataJSON['row_num'];
