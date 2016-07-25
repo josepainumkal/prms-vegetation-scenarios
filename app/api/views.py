@@ -500,7 +500,7 @@ def download_nc(animation_id=''):
     return render_template('vis_netcdf.html', param_list=param_list, scenario_id=animation_id)
 
 @api.route('/api/netCDF_stat_url/<scenario_id>')
-def download_nc(scenario_id=''):
+def download_stat_nc(scenario_id=''):
     '''
     the function is used to get the nc file based on url and return
     param list in the nc file
