@@ -80,6 +80,13 @@ $(document).ready(function(){
         paramMin = parseFloat(metadataJSON['param_min']);
         var scaleSize = Math.floor(paramMax-paramMin)+1;
         colorScale = chroma.scale(['blue','red']).colors(scaleSize);
+
+        dataX = metadataJSON['col_num'];
+        dataY = metadataJSON['row_num'];
+
+        canvasWidth = cellWidth*dataX;
+        canvasHeight = cellHeight*dataY;
+
         // add legend squares here
         $('.legendCanvas').attr('width',canvasWidth.toString()+'px');
         $('.legendCanvas').attr('height',cellHeight);
@@ -88,19 +95,13 @@ $(document).ready(function(){
         for(var i=0; i<dataX; i++)
         {
           tempCanvas2DContext.fillStyle = colorScale[parseInt(scaleSize*i/dataX)];
-          tempCanvas2DContext.fillRect(cellWidth*i,cellHeight,cellWidth,cellHeight);
+          tempCanvas2DContext.fillRect(cellWidth*i,0,cellWidth,cellHeight);
           tempCanvas2DContext.rect(cellWidth*i,cellHeight,cellWidth,cellHeight);
         }
         tempCanvas2DContext.stroke();
 
         $('#legendExplainID').append('min (all the frames) is: '+paramMin.toString()+'; max (all the frames) is: '+paramMax.toString());
 
-
-        dataX = metadataJSON['col_num'];
-        dataY = metadataJSON['row_num'];
-
-        canvasWidth = cellWidth*dataX;
-        canvasHeight = cellHeight*dataY;
 
         $('.mapCanvas').attr('width',canvasWidth.toString()+'px');
         $('.mapCanvas').attr('height',canvasHeight.toString()+'px');

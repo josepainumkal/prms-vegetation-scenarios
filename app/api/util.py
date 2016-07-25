@@ -387,3 +387,43 @@ def get_nc_meta_data(filename,param_name):
     netcdf_aim_file.close()
     return json.dumps(upload_data)
 
+def get_stat_var_name_list(filename):
+    '''
+    This function gets the var name list
+    all the var should be the same size with time
+    '''
+    netcdf_aim_file = netCDF4.Dataset(filename,'r')
+    time_shape = netcdf_aim_file['time'].shape[0]
+
+    var_name_list = []
+
+    for temp_var in netcdf_aim_file.variables.values():
+        # check if the variable is the same size with time
+        if hasattr(temp_var,'shape'):
+            if temp_var.shape[0] == time_shape:
+                var_name_list.append(temp_var.name)
+
+    # netcdf_aim_file.variables.values()[0].shape[0]
+
+    upload_data = { 
+              'time': netcdf_aim_file['time'][:].tolist(), \
+              'param_data':var_name_list \
+           }
+
+    netcdf_aim_file.close()
+
+    return json.dumps(upload_data)
+
+def get_stat_param_data(filename,param_name):
+    '''
+    This function is used to get param values
+    '''
+    netcdf_aim_file = netCDF4.Dataset(filename,'r')
+
+    upload_data = {               
+              'param_data':netcdf_aim_file[param_name][:].tolist() \
+           }
+
+    netcdf_aim_file.close()
+
+    return json.dumps(upload_data)
