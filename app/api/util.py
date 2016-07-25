@@ -180,7 +180,7 @@ def download_prms_inputs(control_url, data_url, param_url):
     app.logger.debug(
         'User: ' + current_user.email + ' finished downloading three input files')
 
-def download_prms_outputs(animation_url, animation_id):
+def download_prms_outputs(animation_url, stats_url, scenario_id):
     '''
     current version only download animation file
     '''
@@ -189,21 +189,27 @@ def download_prms_outputs(animation_url, animation_id):
     if not os.path.exists(app_root):
         os.mkdir(app_root)
 
-    # TODO clean the previous download input files
-    animation_file = app_root + app.config['TEMP_VIS'] + animation_id
+    animation_file = app_root + app.config['TEMP_VIS'] + scenario_id
+    stats_file = app_root + app.config['TEMP_STAT'] + scenario_id
 
     # clean up previous download file
     if os.path.isfile(animation_file):
         os.remove(animation_file)
 
+    if os.path.isfile(stats_file):
+        os.remove(stats_file)
+
     # retrieve url
     animation_url = animation_url.replace('+++', '/')
+    stats_url = stats_url.replace('+++', '/')
 
     # download three inputs file based on the urls
     urllib.urlretrieve(animation_url, animation_file)
+    urllib.urlretrieve(stats_url, stats_file)
 
     app.logger.debug(
-        'User: ' + current_user.email + ' finished downloading animation file')
+        'User: ' + current_user.email + ' finished downloading animation and stats files')
+
 
 # lisa's function, grab temperature from data.nc
 # Rui modified it a little bit to fit current version program

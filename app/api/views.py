@@ -23,7 +23,7 @@ from uuid import uuid4
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
 from flask import session
-from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data, gen_nc_frame_by_frame, get_nc_meta_data, download_prms_outputs
+from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data, gen_nc_frame_by_frame, get_nc_meta_data, download_prms_outputs, get_stat_var_name_list
 from PRMSCoverageTool import ScenarioRun
 
 # import ssl
@@ -231,9 +231,14 @@ def scenarios():
 
         name = request.json['name']
         has_anim = False
+        has_stat = False
         if 'animation_url' in request.json.keys():
             animation_url = request.json['animation_url']
             has_anim = True
+
+        if 'stats_url' in request.json.keys():
+            stats_url = request.json['stats_url']
+            has_stat = True
 
         time_received = datetime.datetime.now()
 
@@ -318,8 +323,9 @@ def scenarios():
 
         # app.logger.debug('start download animation here')
         # download animation file here
-        if has_anim:
-            download_prms_outputs(animation_url, new_scenario.get_id())
+        # TODO should download these two files separately
+        if has_anim and has_stat:
+            download_prms_outputs(animation_url, stats_url, new_scenario.get_id())
 
         # clean up temporary statsvar netCDF
         d.close()
@@ -493,6 +499,22 @@ def download_nc(animation_id=''):
     param_list = get_nc_variable_name(file_location)
     return render_template('vis_netcdf.html', param_list=param_list, scenario_id=animation_id)
 
+@api.route('/api/netCDF_stat_url/<scenario_id>')
+def download_nc(scenario_id=''):
+    '''
+    the function is used to get the nc file based on url and return
+    param list in the nc file
+    TODO I should pass some useful information from post request and then
+    dynamically get files in this step
+    '''
+    app_root = find_user_folder()
+    if not os.path.exists(app_root):
+        os.mkdir(app_root)
+    file_location = app_root + app.config['TEMP_STAT'] + scenario_id
+    # file.save(file_location)
+    #app.logger.debug(get_nc_variable_name(file_location))
+    param_list = get_stat_var_name_list(file_location)
+    return render_template('vis_stat.html', param_list=param_list, scenario_id=scenario_id)
 
 @api.route('/api/get_chosen_data_by_frame/<param_name>/<start_frame>/<end_frame>/<scenario_id>')
 def get_param_data_by_frame_num(param_name='',start_frame='',end_frame='',scenario_id=''):

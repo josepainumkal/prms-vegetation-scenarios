@@ -71,7 +71,7 @@ $(document).ready(function(){
 	var itemCount;
 
 	var animationURL;
-
+	var statsURL;
 	$.get('/api/access_token', function(token){
 		access_token = token;
 
@@ -200,6 +200,10 @@ $(document).ready(function(){
 			{
 				animationURL = data.resources[i].resource_url;
 			}
+			else if(data.resources[i].resource_type == 'statsvar')
+			{
+				statsURL = data.resources[i].resource_url;
+			}
 		}
 
 		// need to replace all the / with +++ in the url
@@ -208,6 +212,7 @@ $(document).ready(function(){
 		dataURL = dataURL.replace(/\//g,'+++');
 		paramURL = paramURL.replace(/\//g,'+++');
 		animationURL = animationURL.replace(/\//g,'+++');
+		statsURL = statsURL.replace(/\//g,'+++');
 		// separate url by ---
 		var url_info = controlURL + '---' + dataURL + '---' + paramURL;
         $.ajax({
@@ -376,7 +381,8 @@ $(document).ready(function(){
 	            {
 	              veg_map_by_hru: inputJson,
 	              name: scenarioName,
-	              animation_url: animationURL
+	              animation_url: animationURL,
+	              stats_url: statsURL
 	            }, null, '\t'),
 	          contentType: 'application/json',
 	          success: function(result) {

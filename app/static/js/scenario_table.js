@@ -71,6 +71,11 @@ $(document).ready(function(){
 	        	window.open(animationURL, 'newwindow', 'width=900,height=1100');
 	        }
 
+	        var visStats = function(tempScenario) {
+	        	var statsURL = "/api/netCDF_stat_url/" + tempScenario._id.$oid;
+	        	window.open(statsURL, 'newwindow', 'width=900,height=1100');
+	        }
+
 	        var deleteScenario = function(sc) {
 	          $.ajax({
 	              method: 'DELETE',
@@ -109,6 +114,12 @@ $(document).ready(function(){
 	                        </a>
 	                    </td>
 
+	                    <td className="download-link">
+	                        <a onClick={visStats.bind(this,scenario)}>
+	                          Visualize Stats File
+	                        </a>
+	                    </td>
+
 
 	                    <td>
 	                      <div className="delete-scenario" id={"delete-"+scenario._id.$oid}>
@@ -133,6 +144,7 @@ $(document).ready(function(){
 	                            <td className="download-link"><strong>View Hydrograph</strong></td>
 	                            <td className="download-link"><strong>Download Hydrograph CSV File</strong></td>
 	                            <td className="download-link"><strong>Visualize Animation File</strong></td>
+	                            <td className="download-link"><strong>Visualize Stats File</strong></td>
 	                            <td><strong>Delete Scenario</strong></td>
 	                        </tr>
 	                    </thead>
