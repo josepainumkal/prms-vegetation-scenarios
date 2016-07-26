@@ -232,6 +232,8 @@ def scenarios():
         name = request.json['name']
         has_anim = False
         has_stat = False
+        animation_url = ''
+        stats_url = ''
         if 'animation_url' in request.json.keys():
             animation_url = request.json['animation_url']
             has_anim = True
@@ -239,6 +241,9 @@ def scenarios():
         if 'stats_url' in request.json.keys():
             stats_url = request.json['stats_url']
             has_stat = True
+
+        app.logger.debug('This is stats url:' + stats_url)
+        app.logger.debug('has_stat:' + has_stat)
 
         time_received = datetime.datetime.now()
 
@@ -502,19 +507,20 @@ def download_nc(animation_id=''):
 @api.route('/api/netCDF_stat_url/<scenario_id>')
 def download_stat_nc(scenario_id=''):
     '''
-    the function is used to get the nc file based on url and return
-    param list in the nc file
-    TODO I should pass some useful information from post request and then
-    dynamically get files in this step
+    '''
+    return render_template('vis_stat.html', scenario_id=scenario_id)
+
+@api.route('/api/netCDF_stat_basic_data/<scenario_id>')
+def get_stat_basic_data(scenario_id=''):
+    '''
+    This function return basic info of the stat nc file
     '''
     app_root = find_user_folder()
     if not os.path.exists(app_root):
         os.mkdir(app_root)
     file_location = app_root + app.config['TEMP_STAT'] + scenario_id
-    # file.save(file_location)
-    #app.logger.debug(get_nc_variable_name(file_location))
     param_list = get_stat_var_name_list(file_location)
-    return render_template('vis_stat.html', param_list=param_list, scenario_id=scenario_id)
+    return param_list
 
 @api.route('/api/get_chosen_data_by_frame/<param_name>/<start_frame>/<end_frame>/<scenario_id>')
 def get_param_data_by_frame_num(param_name='',start_frame='',end_frame='',scenario_id=''):
