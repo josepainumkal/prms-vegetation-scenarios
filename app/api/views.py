@@ -23,7 +23,7 @@ from uuid import uuid4
 from . import api
 from ..models import Scenario, Hydrograph, Inputs, Outputs
 from flask import session
-from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data, gen_nc_frame_by_frame, get_nc_meta_data, download_prms_outputs, get_stat_var_name_list
+from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data, gen_nc_frame_by_frame, get_nc_meta_data, download_prms_outputs, get_stat_var_name_list, get_stat_param_data
 from PRMSCoverageTool import ScenarioRun
 
 # import ssl
@@ -243,7 +243,7 @@ def scenarios():
             has_stat = True
 
         app.logger.debug('This is stats url:' + stats_url)
-        app.logger.debug('has_stat:' + has_stat)
+        # app.logger.debug('has_stat:' + str(has_stat))
 
         time_received = datetime.datetime.now()
 
@@ -508,7 +508,9 @@ def download_nc(animation_id=''):
 def download_stat_nc(scenario_id=''):
     '''
     '''
-    return render_template('vis_stat.html', scenario_id=scenario_id)
+    # I am really confused why scenario_id is '' for the front end
+    # return render_template('vis_stat.html', scenario_id=scenario_id)
+    return render_template('vis_stat.html')
 
 @api.route('/api/netCDF_stat_basic_data/<scenario_id>')
 def get_stat_basic_data(scenario_id=''):
@@ -521,6 +523,18 @@ def get_stat_basic_data(scenario_id=''):
     file_location = app_root + app.config['TEMP_STAT'] + scenario_id
     param_list = get_stat_var_name_list(file_location)
     return param_list
+
+@api.route('/api/netCDF_stat_data/<scenario_id>/<param_name>')
+def obtain_stat_param_data(scenario_id='',param_name=''):
+    '''
+    This function return basic info of the stat nc file
+    '''
+    app_root = find_user_folder()
+    if not os.path.exists(app_root):
+        os.mkdir(app_root)
+    file_location = app_root + app.config['TEMP_STAT'] + scenario_id
+    param_val = get_stat_param_data(file_location,param_name)
+    return param_val
 
 @api.route('/api/get_chosen_data_by_frame/<param_name>/<start_frame>/<end_frame>/<scenario_id>')
 def get_param_data_by_frame_num(param_name='',start_frame='',end_frame='',scenario_id=''):
