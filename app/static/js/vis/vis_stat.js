@@ -56,7 +56,7 @@ $(document).ready(function(){
     var checkboxID = this.value;
     if($("#"+checkboxID).prop("checked"))
     {
-      $.get('/api/netCDF_stat_data/'+scenarioID+'/'+paramName,function(chosenParamData){
+      $.get('/api/netCDF_stat_data/'+scenarioID+'/'+checkboxID,function(chosenParamData){
         var chosenParamJSON = JSON.parse(chosenParamData);
         var chosenParamDataArr = chosenParamJSON['param_data'];
         lineChartName.push(checkboxID);
@@ -66,6 +66,7 @@ $(document).ready(function(){
           tempArr.push(parseFloat(chosenParamDataArr[i]));
           lineChartData[i+1] = tempArr;
         }
+        google.charts.setOnLoadCallback(drawChart);
       });
     }
     // else remove it
@@ -80,9 +81,10 @@ $(document).ready(function(){
         tempArr.splice(chosenParamIndex,1);
         lineChartData[i+1] = tempArr;
       }
+      google.charts.setOnLoadCallback(drawChart);
     }
 
-    google.charts.setOnLoadCallback(drawChart);
+    
   });
 
   function drawChart() {
@@ -95,7 +97,7 @@ $(document).ready(function(){
     };
 
     //var chart = new google.visualization.LineChart($('#lineChartDivID'));
-    var chart = new google.visualization.LineChart(document.getElementById(lineChartDivID));
+    var chart = new google.visualization.LineChart(document.getElementById('lineChartDivID'));
 
     chart.draw(data, options);
   }
