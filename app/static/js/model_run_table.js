@@ -285,6 +285,14 @@ $(document).ready(function(){
 	        latLonInformation['yllcorner'],
 	        latLonInformation['yurcorner']);
 
+	    // I am not sure why the radio button does not work automatically, therefore, I need to change it manually
+	    $("input[type='radio']").change(function(){
+            var tempID = $('#vegetation-type-selector label.active input').val().toString();
+            $("#"+tempID).attr('class','btn btn-custom');
+            $("#"+this.value.toString()).attr('class','btn btn-custom active');
+        });
+
+
 	    $("#myCanvas")
 	    .mousedown(function(evt){
 	      isMousePressing = true;
