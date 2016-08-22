@@ -11,6 +11,7 @@ import os
 import urllib2
 import csv
 import StringIO
+import numpy as np
 
 from werkzeug.datastructures import Headers
 from werkzeug.wrappers import Response
@@ -31,6 +32,34 @@ from PRMSCoverageTool import ScenarioRun
 
 # from flask_security.core import current_user
 from flask.ext.security import current_user
+
+class HruCells(object):
+    def __init__(self,row,col):
+        self.row=row
+        self.col = col
+
+    def dump(self):
+        return [self.row,self.col]
+
+
+
+@api.route('/api/get-parameter-list', methods=['GET'])
+def getParamList():
+    if request.method == 'GET':
+        """generate json file from netcdf file"""
+
+        BASE_PARAMETER_NC = find_user_folder() + app.config['TEMP_PARAM']
+        varList = []
+        handle = netCDF4.Dataset(BASE_PARAMETER_NC,'r')
+        for var in handle.variables:
+            if handle.variables[var].size == 4704:
+                varList.append(var) 
+        varList.sort()
+        handle.close()
+
+        resp={}
+        resp['param_list'] = varList
+        return json.dumps(resp)
 
 
 @api.route('/api/scenarios/metadata/<scenario_id>')
@@ -574,3 +603,82 @@ def test_user():
     print current_user.is_authenticated()
     print current_user.name
     return str(current_user.is_authenticated()) + current_user.email
+
+
+@api.route('/api/prmsparam_submit', methods=['POST'])
+def prmsparam_submit():
+    paramList = request.json['paramList']
+    changeParam = request.json['changeParam']
+    changeToVal = float(request.json['changeToVal'])
+
+    BASE_PARAMETER_NC = find_user_folder() + app.config['TEMP_PARAM']
+    handle = netCDF4.Dataset(BASE_PARAMETER_NC,'a')
+    
+    hruList=[]
+    temp_hruList =[]
+
+    for i in xrange(49):
+        for j in xrange(96):
+            obj = HruCells(i,j)
+            hruList.append(obj) 
+
+
+    for bp in paramList:
+        temp_hruList = hruList[:]
+
+        arr_temp = handle.variables[bp['paramName']][:]
+        low_limit = float(bp['lowLimit'])
+        condition = bp['condition']
+
+        if hasattr(bp, 'highLimit'):
+            high_limit=float(bp['high_limit'])
+        else:
+            high_limit = 0
+               
+
+        for i in temp_hruList:
+            if condition =="between":
+                if arr_temp[i.row][i.col] <= low_limit  or arr_temp[i.row][i.col] >= high_limit:
+                    hruList.remove(i)
+            elif condition =="greater than":
+                if arr_temp[i.row][i.col] <= low_limit:
+                    hruList.remove(i)
+            elif condition =="less than":
+                if arr_temp[i.row][i.col] >= low_limit:
+                    hruList.remove(i)
+            elif condition =="equal to":
+                if arr_temp[i.row][i.col] != low_limit:
+                    hruList.remove(i)        
+
+    #forming the json string
+    data = {}
+    data['chosenHRU'] = [o.dump() for o in hruList]
+
+
+    if len(data["chosenHRU"]) > 0 :
+        temp=np.array([[None]*96]*49)
+        for i in data["chosenHRU"]:
+            temp[i[0]][i[1]] = changeToVal
+
+        for i in xrange(49):
+            for j in xrange(96):
+                if temp[i][j] == None:
+                   temp[i][j] = handle.variables[changeParam][:][i][j]
+
+        handle.variables[changeParam][:] = temp
+        # flash(json_data["chosenHRU"])
+        # flash(handle.variables[changeParam][:])
+
+    
+    param_max = np.amax(handle.variables[changeParam][:].tolist())
+    param_min = np.amin(handle.variables[changeParam][:].tolist())
+    # total_num = len(handle.variables[changeParam][:])
+
+    #Final repsonse while will sent on ajax call
+    resp = {}
+    resp['param_name'] = changeParam
+    resp['param_max'] = param_max
+    resp['param_min'] = param_min
+    resp['modified_handle'] = handle.variables[changeParam][:].tolist()
+    handle.close()
+    return json.dumps(resp)

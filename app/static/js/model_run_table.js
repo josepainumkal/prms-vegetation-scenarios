@@ -220,11 +220,36 @@ $(document).ready(function(){
 		    url : "/api/scenarios/download_input_files/" + url_info,
 		    success: function(result) {
 		    	displayModelModifier();
+		    	getParameterList();
 		    }
 		});
 
 
 	}
+    function getParameterList(){
+    	$.get('/api/get-parameter-list', function(data){
+
+    		 var jsonData = JSON.parse(data);
+            
+             // alert(jsonData['param_list']);    
+             // alert(jsonData['param_list'].length)
+             // alert(jsonData['param_list'][0])
+
+             // var paramList = jsonData['param_list'];
+
+             for(var i=0;i<jsonData['param_list'].length;i++){
+             	$('.show-list-param').append('<option value="' + jsonData['param_list'][i] + '">' + jsonData['param_list'][i] + '</option>');
+             }
+
+      //        var options = []
+      //        $.each(paramList, function(item) {
+      //   		options.append($("<option />").val(item).text(item));
+    		// });
+             // $("#changeParameter").append(options.join(''));
+    	});
+    }
+
+
 
 	// this function is used to display veg modification section
 	function vegeModifier()

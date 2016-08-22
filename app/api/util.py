@@ -149,6 +149,9 @@ def use_default_model_run():
     shutil.copyfile(default_data_folder +
                     app.config['DEFAULT_PARAM'], param_file)
 
+    # change permission
+    os.chmod(param_file, 0666)
+
 
 def download_prms_inputs(control_url, data_url, param_url):
     app_root = find_user_folder()
@@ -175,6 +178,9 @@ def download_prms_inputs(control_url, data_url, param_url):
     urllib.urlretrieve(control_url, control_file)
     urllib.urlretrieve(data_url, data_file)
     urllib.urlretrieve(param_url, param_file)
+
+    # change permisson
+    os.chmod(param_file, 0666)
 
 
     app.logger.debug(
