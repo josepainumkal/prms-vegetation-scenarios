@@ -150,7 +150,7 @@ def use_default_model_run():
                     app.config['DEFAULT_PARAM'], param_file)
 
     # change permission
-    os.chmod(param_file, 0666)
+    #os.chmod(param_file, 0666)
 
 
 def download_prms_inputs(control_url, data_url, param_url):
@@ -180,7 +180,7 @@ def download_prms_inputs(control_url, data_url, param_url):
     urllib.urlretrieve(param_url, param_file)
 
     # change permisson
-    os.chmod(param_file, 0666)
+    #os.chmod(param_file, 0666)
 
 
     app.logger.debug(

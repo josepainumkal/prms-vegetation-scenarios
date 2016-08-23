@@ -32,6 +32,7 @@ from PRMSCoverageTool import ScenarioRun
 
 # from flask_security.core import current_user
 from flask.ext.security import current_user
+import gc
 
 class HruCells(object):
     def __init__(self,row,col):
@@ -607,6 +608,10 @@ def test_user():
 
 @api.route('/api/prmsparam_submit', methods=['POST'])
 def prmsparam_submit():
+    
+    # code fix to avoid restarting container after every prms input ajax call
+    gc.collect()
+
     paramList = request.json['paramList']
     changeParam = request.json['changeParam']
     changeToVal = float(request.json['changeToVal'])
