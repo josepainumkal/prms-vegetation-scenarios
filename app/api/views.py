@@ -679,11 +679,12 @@ def prmsparam_submit():
     param_min = np.amin(handle.variables[changeParam][:].tolist())
     # total_num = len(handle.variables[changeParam][:])
 
-    #Final repsonse while will sent on ajax call
+    #Final repsonse sent on ajax call
     resp = {}
     resp['param_name'] = changeParam
     resp['param_max'] = param_max
     resp['param_min'] = param_min
     resp['modified_handle'] = handle.variables[changeParam][:].tolist()
+    
     handle.close()
     return json.dumps(resp)
