@@ -71,7 +71,7 @@ $(document).on('change', 'select[class="form-control sel_cond"]', function () {
           // $(this).parent().after(newSection);
           var lastRepeatingGroup =$(this).parent().parent().children().last();
 
-          if( !lastRepeatingGroup.attr('class').contains('highValue')){
+          if( lastRepeatingGroup.attr('class').indexOf('highValue') == -1){
 
           	  var template = $(this).parent().parent().children().last();
 		          var newSection = template.clone();
@@ -93,7 +93,7 @@ $(document).on('change', 'select[class="form-control sel_cond"]', function () {
     }
     else{
         var lastRepeatingGroup =$(this).parent().parent().children().last();
-        if( lastRepeatingGroup.attr('class').contains('highValue')){
+        if( lastRepeatingGroup.attr('class').indexOf('highValue') != -1){
       	    lastRepeatingGroup.remove();
         }
     }
@@ -190,9 +190,10 @@ $(document).on('click', '#submitParams', function () {
                     }
                 }
                 canvas2DContext.stroke();
-                
+            
                 updateMapOverlay();
 
+              
                 // $('#outText').val(tempJSON['name']+' will hold a '+tempJSON['event']);
                 // $('#outText').val();
             }
