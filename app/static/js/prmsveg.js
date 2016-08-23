@@ -190,10 +190,9 @@ $(document).on('click', '#submitParams', function () {
                     }
                 }
                 canvas2DContext.stroke();
-            
+                
+                updateMapOverlay();
 
-
-              
                 // $('#outText').val(tempJSON['name']+' will hold a '+tempJSON['event']);
                 // $('#outText').val();
             }
