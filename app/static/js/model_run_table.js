@@ -464,47 +464,39 @@ $(document).ready(function(){
 
 		$('#confirmTemperatureButton').on("click", function() {
 			var inputVal = $('#temperatureModifierID').val();
+			//console.log('input value is '+inputVal.toString());
 			var tempCondition = $('#selTempCondition').val();
+			//console.log('operation is '+tempCondition);
 
-			for(var i=0; i<recordNum; i++)
-			{
-				// -999 means do not change
-				if(jsonData['temperature_values']['tmax'][i] != -999)
-				{
-					if(tempCondition == 'Multiply by'){
-						jsonData['temperature_values']['tmax'][i] = jsonData['temperature_values']['tmax'][i] * inputVal;
-					}else if(tempCondition == 'Divide by'){
-                        jsonData['temperature_values']['tmax'][i] = jsonData['temperature_values']['tmax'][i] / inputVal;
-					}else if(tempCondition == 'Add by'){
-                        jsonData['temperature_values']['tmax'][i] = jsonData['temperature_values']['tmax'][i] + inputVal;
-					}else if(tempCondition == 'Subtract by'){
-                        jsonData['temperature_values']['tmax'][i] = jsonData['temperature_values']['tmax'][i] - inputVal;
-					}
-
-					// jsonData['temperature_values']['tmax'][i] = jsonData['temperature_values']['tmax'][i] * inputVal;					
-				}
-				if(jsonData['temperature_values']['tmin'][i] != -999)					
-				{
-					if(tempCondition == 'Multiply by'){
-						jsonData['temperature_values']['tmin'][i] = jsonData['temperature_values']['tmin'][i] * inputVal;
-					}else if(tempCondition == 'Divide by'){
-                        jsonData['temperature_values']['tmin'][i] = jsonData['temperature_values']['tmin'][i] / inputVal;
-					}else if(tempCondition == 'Add by'){
-                        jsonData['temperature_values']['tmin'][i] = jsonData['temperature_values']['tmin'][i] + inputVal;
-					}else if(tempCondition == 'Subtract by'){
-                        jsonData['temperature_values']['tmin'][i] = jsonData['temperature_values']['tmin'][i] - inputVal;
-					}
-
-					//  jsonData['temperature_values']['tmin'][i] = jsonData['temperature_values']['tmin'][i] * inputVal;
-				}
-				// if(jsonData['temperature_values']['tmax_2'][i] != -999)
-				// {
-				// 	jsonData['temperature_values']['tmax_2'][i] = jsonData['temperature_values']['tmax_2'][i] * inputVal;					
-				// }
-				// if(jsonData['temperature_values']['tmin_2'][i] != -999)
-				// {
-				// 	jsonData['temperature_values']['tmin_2'][i] = jsonData['temperature_values']['tmin_2'][i] * inputVal;
-				// }
+            
+            if(tempCondition == 'Multiply by'){
+            	for(var i=0; i<recordNum; i++){
+            		    if(jsonData['temperature_values']['tmax'][i] != -999)
+							jsonData['temperature_values']['tmax'][i] = parseFloat(jsonData['temperature_values']['tmax'][i]) * parseFloat(inputVal);
+						if(jsonData['temperature_values']['tmin'][i] != -999)		
+						    jsonData['temperature_values']['tmin'][i] = parseFloat(jsonData['temperature_values']['tmin'][i]) * parseFloat(inputVal);			
+            	}	
+			}else if(tempCondition == 'Divide by'){
+				for(var i=0; i<recordNum; i++){
+						if(jsonData['temperature_values']['tmax'][i] != -999)
+							jsonData['temperature_values']['tmax'][i] = parseFloat(jsonData['temperature_values']['tmax'][i]) / parseFloat(inputVal);
+						if(jsonData['temperature_values']['tmin'][i] != -999)		
+						    jsonData['temperature_values']['tmin'][i] = parseFloat(jsonData['temperature_values']['tmin'][i]) / parseFloat(inputVal);	
+            	}           
+			}else if(tempCondition == 'Add by'){
+				for(var i=0; i<recordNum; i++){
+						if(jsonData['temperature_values']['tmax'][i] != -999)
+							jsonData['temperature_values']['tmax'][i] = parseFloat(jsonData['temperature_values']['tmax'][i]) + parseFloat(inputVal);
+						if(jsonData['temperature_values']['tmin'][i] != -999)		
+						    jsonData['temperature_values']['tmin'][i] = parseFloat(jsonData['temperature_values']['tmin'][i]) + parseFloat(inputVal);	
+            	}  				
+			}else if(tempCondition == 'Subtract by'){
+				for(var i=0; i<recordNum; i++){
+						if(jsonData['temperature_values']['tmax'][i] != -999)
+							jsonData['temperature_values']['tmax'][i] = parseFloat(jsonData['temperature_values']['tmax'][i]) + parseFloat(inputVal);
+						if(jsonData['temperature_values']['tmin'][i] != -999)		
+						    jsonData['temperature_values']['tmin'][i] = parseFloat(jsonData['temperature_values']['tmin'][i]) + parseFloat(inputVal);	
+            	}       
 			}
 
 			console.log('temperature modification is done, factor is '+ inputVal.toString());
