@@ -180,8 +180,20 @@
 
           <div id='temperature-controller-id'>
             <p>Input the factor you want to change the temperature, if input is M then all the temperature T will be changed into T*M, M is bigger than 0</p>
-            <input type='number' min='0' step='0.01' id='temperatureModifierID'>
-            <input type='button' class='btn btn-sm btn-sm-map' id='confirmTemperatureButton' value='Update Temperature' />
+             <div class="row">
+                  <div class="col-xs-2"><input  class="form-control" type='number' min='0' step='0.01' id='temperatureModifierID'></div>
+                  <div class="col-xs-2">
+                                          <select  class="form-control" id="selTempCondition" name="selTempCondition">
+                                                  <option>Multiply by</option>
+                                                  <option>Divide by</option>
+                                                  <option>Add by</option>
+                                                  <option>Subtract by</option>
+                                          </select>
+                  </div>
+                  <div class="col-xs-2"> <input type='button' class='btn btn-sm btn-sm-map' id='confirmTemperatureButton' value='Update Temperature' /></div>
+             <br><br>
+             </div>
+           
           </div>
         </div>
 

@@ -57,6 +57,9 @@ class Config:
 
     AUTH_HOST =\
         os.getenv('AUTH_HOST', 'https://192.168.99.100:5005/api')
+
+    VWWEBAPP_HOST = os.environ.get('VWWEBAPP_HOST', 'http://vw-dev:5030')
+    VWCONVERTER_HOST = os.environ.get('VWCONVERTER_HOST', 'http://vw-dev:5020')
     
     AJAX_TIMEOUT = os.getenv('AJAX_TIMEOUT', '10000')
 
