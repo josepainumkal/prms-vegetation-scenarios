@@ -179,7 +179,10 @@
           </div>
 
           <div id='temperature-controller-id'>
-            <p>Input the factor you want to change the temperature, if input is M then all the temperature T will be changed into T*M, M is bigger than 0</p>
+            <!-- <p>Input the factor you want to change the temperature, if input is M then all the temperature T will be changed into T*M, M is bigger than 0</p> -->
+			<p>Input the factor you want to change the temperature. If input is M, and the chosen condition is C = { * , / , + , - }
+            then all the temperature T will be changed into T &lt;C&gt; M, where M is bigger than 0</p> 
+
              <div class="row">
                   <div class="col-xs-2"><input  class="form-control" type='number' min='0' step='0.01' id='temperatureModifierID'></div>
                   <div class="col-xs-2">
