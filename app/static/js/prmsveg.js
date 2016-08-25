@@ -11,6 +11,10 @@ $(function(){
    }
 });
 
+function forceNumeric() {
+     $(".onlyNumeric").ForceNumericOnly();
+}
+
 
 $(document).on('click', '#addParam', function () {
 

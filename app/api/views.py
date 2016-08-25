@@ -27,6 +27,7 @@ from flask import session
 from util import get_veg_map_by_hru, model_run_name, download_prms_inputs, find_user_folder, use_default_model_run, add_values_into_json, add_values_into_netcdf, get_nc_variable_name, get_chosen_param_data, gen_nc_frame_by_frame, get_nc_meta_data, download_prms_outputs, get_stat_var_name_list, get_stat_param_data
 from PRMSCoverageTool import ScenarioRun
 
+
 # import ssl
 # ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -641,19 +642,38 @@ def prmsparam_submit():
             high_limit = 0
                
 
-        for i in temp_hruList:
-            if condition =="between":
+        if condition =="between":
+            for i in temp_hruList:
                 if arr_temp[i.row][i.col] <= low_limit  or arr_temp[i.row][i.col] >= high_limit:
                     hruList.remove(i)
-            elif condition =="greater than":
+
+        elif condition =="greater than":
+            for i in temp_hruList:
                 if arr_temp[i.row][i.col] <= low_limit:
                     hruList.remove(i)
-            elif condition =="less than":
+        elif condition =="less than":
+            for i in temp_hruList:
                 if arr_temp[i.row][i.col] >= low_limit:
                     hruList.remove(i)
-            elif condition =="equal to":
+        elif condition =="equal to":
+            for i in temp_hruList:
                 if arr_temp[i.row][i.col] != low_limit:
-                    hruList.remove(i)        
+                    hruList.remove(i)      
+
+
+        # for i in temp_hruList:
+        #     if condition =="between":
+        #         if arr_temp[i.row][i.col] <= low_limit  or arr_temp[i.row][i.col] >= high_limit:
+        #             hruList.remove(i)
+        #     elif condition =="greater than":
+        #         if arr_temp[i.row][i.col] <= low_limit:
+        #             hruList.remove(i)
+        #     elif condition =="less than":
+        #         if arr_temp[i.row][i.col] >= low_limit:
+        #             hruList.remove(i)
+        #     elif condition =="equal to":
+        #         if arr_temp[i.row][i.col] != low_limit:
+        #             hruList.remove(i)        
 
     #forming the json string
     data = {}
@@ -685,6 +705,6 @@ def prmsparam_submit():
     resp['param_max'] = param_max
     resp['param_min'] = param_min
     resp['modified_handle'] = handle.variables[changeParam][:].tolist()
-    
+
     handle.close()
     return json.dumps(resp)
