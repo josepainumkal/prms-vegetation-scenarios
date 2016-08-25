@@ -6,10 +6,17 @@ import os
 import time
 
 from numpy import reshape
+import numpy
+from flask import current_app as app
+from flask import session
+
+from util import find_user_folder
 
 from client.model_client.client import ModelApiClient
 from client.swagger_client.apis.default_api import DefaultApi
 
+# import ssl
+# ssl._create_default_https_context = ssl._create_unverified_context
 
 class ScenarioRun:
     """
@@ -93,13 +100,18 @@ class ScenarioRun:
         if hru != []:
 
             ctmat = self.working_scenario.variables['cov_type'][:]
+            
             ctvec = ctmat.flatten()
             ctvec[hru] = val
             self.working_scenario.variables['cov_type'][:] = \
                 reshape(ctvec, ctmat.shape)
 
-    def run(self, auth_host=None, model_host=None,
-            app_username=None, app_password=None):
+            # TODO check if this part works
+            # doing this coz justin nc is transposed
+            # temp_cov_type = self.working_scenario.variables['cov_type'][:]
+            # self.working_scenario.variables['cov_type'][:] = numpy.transpose(temp_cov_type)
+
+    def run(self, auth_host=None, model_host=None):
         """
         Run PRMS on model server using the updated parameters file and
         standard data.nc and control.nc files.
@@ -119,8 +131,7 @@ class ScenarioRun:
             )
             return
 
-        cl = ModelApiClient(auth_host=auth_host, model_host=model_host)
-        cl.authenticate_jwt(username=app_username, password=app_password)
+        cl = ModelApiClient(api_key=session['api_token'],auth_host=auth_host, model_host=model_host)
 
         api = DefaultApi(api_client=cl)
 
@@ -128,11 +139,14 @@ class ScenarioRun:
             modelrun=dict(title=self.scenario_name, model_name='prms')
         )
 
+        # name input files with the id, rename temp name with id+control
+        input_file_folder = find_user_folder()
+
         api.upload_resource_to_modelrun(
-            mr.id, 'control', 'app/static/data/LC.control'
+            mr.id, 'control', input_file_folder + app.config['TEMP_CONTROL']
         )
         api.upload_resource_to_modelrun(
-            mr.id, 'data', 'app/static/data/LC.data.nc'
+            mr.id, 'data', input_file_folder + app.config['TEMP_DATA']
         )
         api.upload_resource_to_modelrun(
             mr.id, 'param', self.scenario_file

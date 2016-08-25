@@ -55,7 +55,7 @@ var ScenarioList = React.createClass({
 
         var displayHydrograph = function(tempScenario) {
             var hydrographURL = '/hydrograph_vis/'+tempScenario._id.$oid;
-            window.open(hydrographURL, 'newwindow', 'width=900,height=1100');
+            window.open(hydrographURL, 'newwindow', 'width=900,height=1200');
         }
 
         var deleteScenario = function(sc) {
@@ -64,12 +64,13 @@ var ScenarioList = React.createClass({
               url: '/api/scenarios/' + sc._id.$oid
           });
         }
-
+        // <!-- not sure why cannot find time recieved var-->
+        // <!-- <td>{new Date(scenario.time_received.$date).toISOString().slice(0,19)}</td>-->
         var tableRows = this.props.data.scenarios.map(function(scenario) {
             return (
                 <tr key={scenario._id.$oid}>
                     <td>{scenario.name}</td>
-                    <td>{new Date(scenario.time_received.$date).toISOString().slice(0,19)}</td>
+
                     <td>{
                            scenario.time_finished ?
                            new Date(scenario.time_finished.$date).toISOString().slice(0,19) :
@@ -102,13 +103,13 @@ var ScenarioList = React.createClass({
             );
         });
 
+        //<!--//<td><strong>Time Received</strong></td>-->
         var scenarioList =
             <div className="scenarioList">
                 <table className="table table-striped">
                     <thead>
                         <tr>
                             <td><strong>Scenario Name</strong></td>
-                            <td><strong>Time Received</strong></td>
                             <td><strong>Time Finished</strong></td>
                             <td><strong>Download Inputs</strong></td>
                             <td><strong>Download Outputs</strong></td>

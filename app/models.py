@@ -2,6 +2,44 @@ import json
 
 from . import db
 
+from . import userdb
+
+from flask.ext.security import UserMixin, RoleMixin
+
+roles_users = userdb.Table('roles_users',
+                       userdb.Column('user_id', userdb.Integer(), userdb.ForeignKey('users.id')),
+                       userdb.Column('role_id', userdb.Integer(), userdb.ForeignKey('roles.id')))
+
+
+class User(UserMixin, userdb.Model):
+    __tablename__ = 'users'
+    #__bind_key__ = 'users'
+    id = userdb.Column(userdb.Integer, primary_key=True)
+    email = userdb.Column(userdb.String(255), unique=True)
+    password = userdb.Column(userdb.String(255))
+    name = userdb.Column(userdb.String(255))
+    affiliation = userdb.Column(userdb.String(255))
+    state = userdb.Column(userdb.String(255))
+    city = userdb.Column(userdb.String(255))
+    active = userdb.Column(userdb.Boolean())
+    confirmed_at = userdb.Column(userdb.DateTime())
+    roles = userdb.relationship('Role', secondary=roles_users,
+                            backref=userdb.backref('users', lazy='dynamic'))
+    last_login_at = userdb.Column(userdb.DateTime())
+    current_login_at = userdb.Column(userdb.DateTime())
+    last_login_ip = userdb.Column(userdb.String(255))
+    current_login_ip = userdb.Column(userdb.String(255))
+    login_count = userdb.Column(userdb.Integer)
+
+    def __repr__(self):
+        return '<models.User[email=%s]>' % self.email
+
+
+class Role(RoleMixin, userdb.Model):
+    __tablename__ = 'roles'
+    id = userdb.Column(userdb.Integer(), primary_key=True)
+    name = userdb.Column(userdb.String(80), unique=True)
+    description = userdb.Column(userdb.String(255))
 
 class Hydrograph(db.EmbeddedDocument):
     """
@@ -58,7 +96,8 @@ class Scenario(db.Document):
     Scenario data and metadata
     """
     name = db.StringField(required=True)
-    user = db.StringField(default='anonymous')
+    # user = db.StringField()
+    user_id = db.IntField()
 
     time_received = db.DateTimeField(required=True)
     time_finished = db.DateTimeField()
@@ -69,6 +108,9 @@ class Scenario(db.Document):
     outputs = db.EmbeddedDocumentField('Outputs')
 
     hydrograph = db.EmbeddedDocumentField('Hydrograph')
+
+    def get_id(self):
+        return str(self.pk)
 
     def to_json(self):
         """
@@ -86,6 +128,16 @@ class Scenario(db.Document):
         js_dict['time_finished'] = self.time_finished.isoformat()
 
         js_dict['id'] = str(self.pk)
+
+        return json.dumps(js_dict)
+
+    def to_json_simple(self):
+        """
+        Override db.Document's to_json for custom date fomratting
+        only get meta data
+        """
+
+        js_dict = {'time_received':self.time_received.isoformat(), 'time_finished':self.time_finished.isoformat(),'id':str(self.pk)}
 
         return json.dumps(js_dict)
 

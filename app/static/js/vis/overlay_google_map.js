@@ -43,7 +43,8 @@ function overlayCanvasonGoogleMap(xllcorner,xurcorner,yllcorner,yurcorner)
       {
         onrendered: function(canvas) {
           imgURL = canvas.toDataURL();
-          google.maps.event.addDomListener(window, 'load', initialize);
+          //google.maps.event.addDomListener(window, 'load', initialize);
+          initialize();
         }
       }); 
   }

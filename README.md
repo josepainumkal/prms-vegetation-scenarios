@@ -20,12 +20,12 @@ show what needs to be done.
 The first step to getting started is to set up the development
 modeling and authorization server using Docker. You will need to install the
 [docker-toolkit](https://www.docker.com/products/docker-toolbox) no matter what
-OS you're working with.
+OS you're working with. 
 
 Next, clone
 [vw-deploy](https://github.com/VirtualWatershed/vw-deploy), start a new docker
 machine, then create an account on the docker machine you started by visiting
-`ip-of-your-docker-machine:5005`.
+`ip-of-your-docker-machine:5005`. (Let's use "a@b.com" as the username and "123456" as the password)
 
 To get the ip of your docker machine, run `docker-machine ip vw-machine`.
 Probably it will be `196.168.99.100`. But it may not be, so be sure to check.
@@ -68,6 +68,26 @@ the development system. But on the upside, it's easy to create a new development
 account. To "receive" your confirmation email, navigate to
 [http://196.168.99.100:1080](http://196.168.99.100:1080) to read your
 development emails.
+
+And then we need to open another terminal and connect to our docker virtual machine:
+```bash
+eval $(docker-machine env default)
+``` 
+Start a mongo container with the name mongo:
+```bash
+docker run --name mongo -d mongo
+```
+Go to the prms vegetation repo folder, for me it is: Desktop/prms-vegetation-scenarios
+Run this command to create an docker image with the name proms-veg:
+```
+docker build -t prms-veg .
+```
+Run a container with the image prms-veg, the port number is 5010. The container name is prms:
+```
+docker run --name prms -e APP_PORT=5010 -e APP_USERNAME='a@b.com' -e APP_PASSWORD='123456'  -e MONGODB_HOST=mongo  -p 5010:5010 -v /Users/rwu/Desktop/prms-vegetation-scenarios/app:/var/www/prms-veg/app --link mongo:mongo  prms-veg python manage.py runserver -h 0.0.0.0 -p 5010 --threaded
+```
+And then visit [http://192.168.99.100:5010/scenario_table](http://192.168.99.100:5010/scenario_table)
+You will see the scenario table and create a scenario by yourself.
 
 ## Install Non-Dockerized Dependencies and Run the App
 

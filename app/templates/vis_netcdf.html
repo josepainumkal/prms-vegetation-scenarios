@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- this may be not the right way to include js files -->
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <!-- I use Google Chart for this project -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="/static/bower_components/chroma-js/chroma.min.js"></script>
+    <script type="text/javascript" src="/static/js/vis/vis_netcdf.js"></script>
+
+    <style> /* set the local CSS */
+      div.metaData
+      {
+        display:none;
+      }
+    </style>
+
+</head>
+
+<div class="metaData">
+  <p id='scenarioIDParagraph'>{{ scenario_id }}</p>
+</div>
+
+<div class="container">
+    <div class="row">
+
+      <div id='uploadfileDiv'>
+        <h4>Step 1) Choose a parameter from the upload netcdf file</h4>
+        <p>
+          <select class="form-control" id='paramSelectBoxID'>
+            {% for i in param_list %}
+              <option value={{ i }}>{{ i }}</option>
+            {% endfor %}
+          </select>
+        </p>
+        <p><button type="button" class='btn btn-sm btn-sm-map' id='confirmParamButtonID'>Confirm</button></p>
+       
+      </div>
+
+      <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
+          <p>  
+            <canvas class='mapCanvas' id="myCanvas" style="border:1px solid #c3c3c3;" >
+              Your browser does not support the HTML5 canvas tag.
+            </canvas>
+            <p id='frameParagraphID'></p>
+            <p id='legendID'>
+              <canvas class='legendCanvas' id="legendCanvas" style="border:1px solid #c3c3c3;" >
+                  Your browser does not support the HTML5 canvas tag.
+              </canvas>
+            </p>
+            <p id='legendExplainID'></p>
+          </p>
+          <p>
+            <button type="button" class='btn btn-sm btn-sm-map' id='nextFrameID'>Next Frame</button>
+            <button type="button" class='btn btn-sm btn-sm-map' id='playFrameID'>Play</button>
+            <button type="button" class='btn btn-sm btn-sm-map' id='stopFrameID'>Stop</button>
+          </p>
+      </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

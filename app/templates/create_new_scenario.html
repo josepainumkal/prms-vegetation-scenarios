@@ -1,0 +1,421 @@
+<!-- Home page for our human adaptor -->
+{% extends "base.html" %}
+{% set active_page = "index" %}
+{% block scripts %}
+    {{ super() }}
+    <!-- THIS JS IS USED TO TAKE SCREENSHOT -->
+    <script type="text/javascript" src='/static/bower_components/html2canvas/build/html2canvas.min.js' type='text/javascript'></script>
+    <!-- THIS JS IS an AWESOME COLOR LIB -->
+    <script type="text/javascript" src="/static/bower_components/chroma-js/chroma.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBINKUFZugKXNT1ieZy315WFViufQUZvv4"
+    async defer></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="/static/js/vis/overlay_google_map.js"></script>
+    <!-- THIS JS IS USED FOR 2D map polygon -->
+    <script type="text/babel" src="/static/js/model_run_table.js"></script>
+    <script src="/static/js/prmsveg.js"></script>
+{% endblock %}
+{% block link %}
+    {{ super() }}
+{% endblock %}
+{% block head_ext %}
+    {{ super() }}
+    <style>
+      .delete-scenario {
+        vertical-align: middle;
+        text-align: center;
+        border-width: 1px;
+      }
+      .delete-scenario:hover {
+        cursor: pointer;
+      }
+      .delete-scenario span {
+        line-height: 20px;
+      }
+    #map {
+      width: 90%;
+      height: 350px;
+      margin: 20px auto;
+    }
+    #new-scenario-menu-content {
+      position: relative;
+    }
+    #scenario-list {
+      display: table;
+    }
+    .section-header {
+      text-decoration: underline;
+    }
+    .btn-custom {
+      border-color: #dfd7ca;
+      border-width: 2px;
+      border-style: solid;
+    }
+    .btn-custom.active {
+      background-color: #f8f5f0;
+    }
+    .btn-custom:hover {
+      background-color: #f8f5f0;
+      color: #3e3f3a;
+    }
+    .btn {
+      margin: 3.5px;
+    }
+    #vegetation-type-selector {
+      margin: 15px;
+    }
+    label {
+      display: block;
+    }
+    a.remove-veg-update:hover {
+      cursor: pointer;
+    }
+    span.legend {
+      display: inline-block;
+    }
+    span#bare-ground-square {
+      color: pink;  
+    }
+    span#grasses-square {
+      color: black;  
+    }
+    span#shrubs-square {
+      color: blue;  
+    }
+    span#trees-square {
+      color: red;  
+    }
+    span#conifers-square {
+      color: green;  
+    }
+    
+    input#map-toggle {
+      display: none;
+    }
+    input#map-toggle + div#mapControl {
+      display: block;
+    }
+    input#map-toggle:checked + div#mapControl {
+      display: none;
+    }
+    div#maps {
+      margin-top: 20px;
+    }
+    input.btn-sm-map {
+      border-style: solid;
+      border-width: 2px;
+      margin: 4px;
+    }
+    input.btn-sm-map:hover {
+      color:black; 
+      
+      border-style: solid;
+      border-width: 2px;
+      margin: 4px;
+    }
+    td.download-link>a:hover {
+      cursor: pointer;
+    }
+    .metaData {
+      visibility: hidden;
+    }
+    #model-veg-modifier-div-id {
+      visibility: hidden;
+    }
+    #step-2-dive-id {
+      visibility: hidden;
+    }
+    input.form-control, select.form-control {
+  /*height: 50px;*/
+     padding-bottom:0; 
+      padding-top:0;
+      height: 35px  
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+<div class='metaData'>
+  <p id='model_run_server_id'>{{model_run_server}}</p>
+  <p id='param_list_id'>{{varList}}</p>
+</div>
+
+<div class="container">
+    
+    <div class="row" id='model-run-list'>
+        <div id='step-1-title-id'><h5>1. You need to choose a model run</h5></div>
+        <h3 class="section-header">List of Completed Model Run ID</h3>
+
+        <div id='additional-info'></div>
+    
+        <div className="modelRunList">
+            <table class="table table-striped" id='model-run-table-id'>
+                <thead>
+                    <tr>
+                        <td><strong>Model ID</strong></td>
+                        <td><strong>Title</strong></td>
+                        <td><strong>Time Created</strong></td>
+                        <td className="download-link"><strong>Choose This Model Run</strong></td>
+                    </tr>
+                </thead>
+
+                <tbody id='model-run-items'>
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    <div class="row" id='step-2-dive-id'>
+        <div id='step-2-title-id'></div>
+        <div>
+          <p>If there are more than 1000, I will get every 20 temperature of all the records. I cannot show them all because the are too many records</p>
+        </div>
+
+        <div id='model-temperature-modifier-div-id'>
+          <div id='temperature-line-chart-id' style="width: 1200px; height: 900px">
+          </div>
+
+          <div id='temperature-controller-id'>
+            <!-- <p>Input the factor you want to change the temperature, if input is M then all the temperature T will be changed into T*M, M is bigger than 0</p> -->
+            <p>Input the factor you want to change the temperature. If input is M, and the chosen condition is C = { * , / , + , - }
+            then all the temperature T will be changed into T &lt;C&gt; M, where M&gt;0</p> 
+
+             <div class="row">
+                  <div class="col-xs-2">
+                                          <select  class="form-control" id="selTempCondition" name="selectCondition1">
+                                                  <option>Multiply by</option>
+                                                  <option>Divide by</option>
+                                                  <option>Add by</option>
+                                                  <option>Subtract by</option>
+                                          </select>
+                  </div>
+                  <div class="col-xs-2"><input  class="form-control" type='number' min='0' step='0.01' id='temperatureModifierID'></div>
+                  <div class="col-xs-2"> <input type='button' class='btn btn-sm btn-sm-map' id='confirmTemperatureButton' value='Update Temperature' /></div>
+             <br><br>
+             </div>
+           
+          </div>
+        </div>
+
+    </div>
+
+    <div class="row" id='step-3-dive-id'>
+        <div id='step-3-title-id'></div>
+
+        <div id='model-veg-modifier-div-id'>
+
+                <div class = "panel panel-primary">
+                         <div class = "panel-heading">
+                            <h3 class = "panel-title">Select Parameters</h3>
+                         </div>
+                         
+                         <div class = "panel-body">
+
+                            <form method="post" enctype="multipart/form-data" data-toggle="validator" role="form" style="margin-left: 100px;">
+                            <input type="hidden" id="totalParams" name="totalParams" value="" />
+
+                            <div class="row">
+                                <div class="col-xs-2"></div><br><br>
+                                <p class="h4">&nbsp;&nbsp;&nbsp;Change Parameter Value of Selected HRU's:</p><br><br>
+                                <div class="col-xs-2"></div>
+                            </div>
+                            <div class="row">
+                                           <div class="col-xs-3">
+                                                <label for="selectParameter">Choose Parameter :</label>
+                                                <select class="form-control show-list-param" id="changeParameter" name="changeParameter"> 
+                                                </select>
+                                                <br><br><br>
+                                          </div>
+                                          <div class="col-xs-3">
+                                             <label for="selectParameter">New Value: </label>
+                                             <input class="form-control input-sm onlyNumeric" type="number" step="0.000000000000001" name="changeToVal" id="changeToVal" title ="Enter a numeric value" required>
+                                          </div>
+                                          <div class="col-xs-3">
+                                              <br><button id="submitParams" type="button" class="btn btn-warning btn-md">Submit</button><br><br><br>
+                                          </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-xs-2"></div>
+                                <p class="h4">&nbsp;&nbsp;&nbsp;Select HRU's based on below parameter constraints:</p>
+                                <div class="col-xs-2"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xs-2"></div>
+                                <div class="col-xs-2"></div>
+                                <div class="col-xs-2"></div>
+                                <div class="col-xs-2"></div>
+                                <div class="col-xs-2"></div>
+                                <div class="col-xs-1">
+                                    <a  id="addParam" role="button"><span class="glyphicon glyphicon-plus-sign"  style="color:green;">ADD</span></a>
+                                </div>
+                                <div class="col-xs-1">
+                                <a id="deleteParam" role="button"><span class="glyphicon glyphicon-remove-sign"  style="color:red;">DELETE</span></a>
+                                </div><br><br>
+                            </div>
+
+
+                              
+                            <div class="row repeat-parameter" id="1">
+                                           <div class="col-xs-3">
+                                                <label for="selectParameter">Choose Parameter:</label>
+                                                <select class="form-control show-list-param" id="selectParameter1" name="selectParameter1">
+                                                </select>
+                                                <br>
+                                          </div>
+                                          <div class="col-xs-3">
+                                                <label for="selectCondition">Condition:</label>
+                                                <select class="form-control sel_cond" id="selectCondition1" name="selectCondition1">
+                                                  <option>greater than</option>
+                                                  <option>less than</option>
+                                                  <option>equal to</option>
+                                                  <option>between</option>
+                                                </select>
+                                                <br>
+                                          </div>    
+                                          <div class="col-xs-3">
+                                              <div class="form-group">
+                                              <label for="cols">Value:</label>
+                                              <input class="form-control input-sm onlyNumeric" onfocus="forceNumeric()" type="number" step="0.000000000000001" name="l1" id="l1" title ="Enter a numeric value" required>
+                                              </div>
+                                          </div>
+                            </div>
+
+                              
+                            </form>
+
+                         </div>
+              </div>
+
+
+              <p>  
+                        <canvas class='mapCanvas' id="myCanvas" style="border:1px solid #c3c3c3;" >
+                         Your browser does not support the HTML5 canvas tag.
+                        </canvas>
+                      <!--   <p id='frameParagraphID'></p>
+                          <p id='legendID'>
+                              <canvas class='legendCanvas' id="legendCanvas" style="border:1px solid #c3c3c3;" >Your browser does not support the HTML5 canvas tag.</canvas>
+                          </p>
+                          <p id='legendExplainID'></p> -->
+              </p>
+           <!-- <div class="row">
+                <h2>Instructions</h2>
+                <p>
+                    This tool allows you to run various PRMS scenarios for 
+                    vegetation states. First, select the grid cells you want to change
+                    to another vegetation type. Then, select which vegetation type you
+                    wish to apply to the map. 
+                </p>
+            </div>
+
+
+            <div class="row">
+                <h3 class="section-header">Create a New Scenario</h3>
+                <h4>1. Select Vegetation Type</h4>
+                  {% include 'includes/veg-type-selector.html' %}
+            </div> -->
+
+            <!-- TODO need to improve design -->
+            <!-- <div class="row">
+                <h4>2.a Change the vegetation using elevation information</h4>
+                <p>Press the "UPDATE MAP BY ELEVATION" button and all the hru cell above the input elevation veg type will be
+                  changed into the type chosen in Step 1</p>
+                <div id='elevationInputID'>
+                </div>
+            </div>
+
+            <div class="row">
+              <h4>2. Select HRU on map for the selected vegetation type then save to persist the change</h4>
+              <h5>(Repeat 1 & 2 to add more vegetation updates)</h5>
+
+
+              <button class="btn btn-default" id="resetCanvasButton" style="width: 32%"> 
+                Reset Map 
+              </button>
+              <button class="btn btn-default" id="save-veg-update" style="width: 65%"> 
+                  Confirm Vegetation Modification
+              </button>
+
+              <div id="veg-update-list"></div> -->
+
+
+              <div id="maps" class="row">
+
+                   <!--  <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
+                      <canvas class='mapCanvas' id="myCanvas" style="border:1px solid #c3c3c3;" >
+                        Your browser does not support the HTML5 canvas tag.
+                      </canvas>
+                    </div>-->
+                    <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12" >
+
+                      <label for="map-toggle" style="font-size: 32px;">Click Here To Hide/Show Map</label>
+                      <input id="map-toggle" type="checkbox">
+                      <div id='mapControl'>
+                        <input type="button" class="btn btn-sm btn-sm-map" 
+                               id="removeOverlayButton" value="Remove the overlay image" />
+                        <input type="button" class="btn btn-sm btn-sm-map" 
+                               id="addOverlayButton" value="add the overlay image" />
+                        <p>
+                            <h4>
+                              Set the opacity of the overlay (between 0 and 1.0)
+                            </h4>
+                            <input type="number" min="0.0" max="1.0" step="0.1" id="opacitySelectorID">
+                            <input type="button" id="changeOpacityButton" value="Confirm Opacity" />
+                        </p>
+                        <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                          <div id='googleMapDiv' style="width:800px;height:600px;">
+
+                          </div>
+                        </div>
+                      </div>
+
+                  </div>
+
+
+                </div>
+
+            </div>
+
+
+            <h4>4. Enter a scenario</h4>
+
+            <div class="row" 
+                    id="new-scenario-menu" align="center">
+                <div style="width:70%" align="left">
+                    <label for="scenario-name">Scenario Name</label>
+                    <div align="center">
+                        <input type="text" name="scenario-name" 
+                               style="width:100%; margin-bottom: 15px;"
+                               id="scenario-name-input"
+                               placeholder="Use a descriptive name, e.g., Flood Event, Severe Drought, etc." 
+                               required />
+                    </div>
+                </div>
+            </div>
+
+
+            <h4>5. Run the scenario</h4>
+            <h5>The result will show in the list below when it's finished</h5>
+            <div id='patient-reminder'></div>
+            <div class="row" align="center">
+                <button id="submitChangetoServerButton" class="btn btn-default" 
+                        style="width: 100%; margin-top: 15px;">
+                    Run Scenario
+                </button>
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+
+{% endblock %}
