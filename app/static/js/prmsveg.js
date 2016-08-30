@@ -10,16 +10,32 @@ $(function(){
    	   // template0 = $('.repeat-parameter').first();
    }
    //showParamDetails();
+
+     //on tab change
+      $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+              var target = $(e.target).attr("href") // activated tab
+              var chosenParamVal;
+
+              if(target == "#hruFromGrid"){
+                  chosenParamVal = $('#changeParameterHG').val();
+              }else{
+                  chosenParamVal = $('#changeParameter').val();
+              }
+              
+              if(chosenParamVal!=null){
+                showParamDetailsAjax(chosenParamVal);
+              }
+      });
 });
 
 function forceNumeric() {
      $(".onlyNumeric").ForceNumericOnly();
 }
 
-function showParamDetails(){
-      chosenParamVal = $('#changeParameterHG').val();
 
-      $.ajax({
+function showParamDetailsAjax(chosenParamVal){
+
+  $.ajax({
             type : "GET",
             url : "/api/get-chosen-parameter-details",
             data:{
@@ -28,15 +44,35 @@ function showParamDetails(){
             dataType: 'json',
             contentType: 'application/json',
             success: function(result) {
-                $('#pName').text(result.chosenParam_name)
-                $('#pDesc').text(result.layer_desc)
-                $('#pMin').text(result.chosenParam_minVal)
-                $('#pMax').text(result.chosenParam_maxVal)
-   
+              
+               if($('#hruFromParam').attr('class').indexOf('active') == -1){
+                    $('#pNameHG').text(result.chosenParam_name)
+                    $('#pDescHG').text(result.layer_desc)
+                    $('#pMinHG').text(result.chosenParam_minVal)
+                    $('#pMaxHG').text(result.chosenParam_maxVal)
+               }else{
+                    $('#pName').text(result.chosenParam_name)
+                    $('#pDesc').text(result.layer_desc)
+                    $('#pMin').text(result.chosenParam_minVal)
+                    $('#pMax').text(result.chosenParam_maxVal)
+               }
             }
          });
+
 }
 
+function showParamDetails(){ 
+     var chosenParamVal;
+     if($('#hruFromParam').attr('class').indexOf('active') == -1){
+          chosenParamVal = $('#changeParameterHG').val();
+     }else{
+          chosenParamVal = $('#changeParameter').val();
+     }
+    //chosenParamVal = $('#changeParameterHG').val();
+    if(chosenParamVal!=null){
+        showParamDetailsAjax(chosenParamVal)
+    }
+}
 
 $(document).on('click', '#addParam', function () {
 
@@ -195,8 +231,8 @@ $(document).on('click', '#submitParams', function () {
                 colorScale = chroma.scale(['blue','red']).colors(scaleSize);
 
 
-                var cellWidth = 10;
-                var cellHeight = 10;
+                var cellWidth = 12;
+                var cellHeight = 12;
                 var dataX = 96;
                 var dataY = 49;
                 canvasWidth = cellWidth*dataX;

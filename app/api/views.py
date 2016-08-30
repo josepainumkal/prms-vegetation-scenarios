@@ -743,7 +743,6 @@ def updateToParamFile():
 
 
     chosenAreaInfo = request.json['chosenAreaInfo']
-    app.logger.debug('jose is a panda')
     # app.logger.debug(chosenAreaInfo)
     # app.logger.debug(len(chosenAreaInfo))
 
@@ -766,8 +765,8 @@ def updateToParamFile():
             paramValueMap[paramVal] = gridNos
             paramMap[paramName] = paramValueMap
 
-        app.logger.debug("printing parammaps***********************")
-        app.logger.debug(paramMap)
+        # app.logger.debug("printing parammaps***********************")
+        # app.logger.debug(paramMap)
 
 
     #updating in the values of param handle
@@ -793,8 +792,8 @@ def updateToParamFile():
                    temp[i][j] = handle.variables[paramName][:][i][j]
 
         handle.variables[paramName][:] = temp
-        app.logger.debug("HERE COMES MY TEMP")
-        app.logger.debug(temp)
+        # app.logger.debug("HERE COMES MY TEMP")
+        # app.logger.debug(temp)
 
 
     handle.close()
@@ -802,7 +801,3 @@ def updateToParamFile():
     # app.logger.debug("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFParam map i contructed is below")
     # app.logger.debug(paramMap)
     return "success"
-
-
-    # for i in len(chosenAreaInfo):
-    #     app.logger.debug(i['paramName']

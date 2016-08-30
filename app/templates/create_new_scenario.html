@@ -212,7 +212,7 @@
 
         <div id='model-veg-modifier-div-id'>
                 <br><br><br>
-				<div class="container">
+				<div class="container paramUpdateTabs">
 				  <!-- <h2>Dynamic Pills</h2> -->
 				  <ul class="nav nav-tabs">
 				    <li class="active"><a data-toggle="tab" href="#hruFromParam">Select HRU's based on Param Constraints</a></li>
@@ -231,30 +231,47 @@
 			                            <form method="post" enctype="multipart/form-data" data-toggle="validator" role="form" style="margin-left: 100px;">
 			                            <input type="hidden" id="totalParams" name="totalParams" value="" />
 
-			                            <div class="row">
+			                           <!--  <div class="row">
 			                                <div class="col-xs-2"></div><br><br>
 			                                <p class="h4">&nbsp;&nbsp;&nbsp;Change Parameter Value of Selected HRU's:</p><br><br>
 			                                <div class="col-xs-2"></div>
-			                            </div>
+			                            </div> -->
 			                            <div class="row">
-			                                           <div class="col-xs-3">
+			                                         <div class="col-xs-3"><br>
 			                                                <label for="selectParameter">Choose Parameter :</label>
 			                                                <select class="form-control show-list-param" id="changeParameter" name="changeParameter"> 
 			                                                </select>
-			                                                <br><br><br>
+			                                                <!-- <br><br><br> -->
 			                                          </div>
-			                                          <div class="col-xs-3">
+			                                          <div class="col-xs-3"><br>
 			                                             <label for="selectParameter">New Value: </label>
 			                                             <input class="form-control input-sm onlyNumeric" type="number" step="0.000000000000001" name="changeToVal" id="changeToVal" title ="Enter a numeric value" required>
 			                                          </div>
-			                                          <div class="col-xs-3">
-			                                              <br><button id="submitParams" type="button" class="btn btn-warning btn-md">Submit</button><br><br><br>
+			                                          <div class="col-xs-3"><br>
+			                                              <br><button id="submitParams" type="button" class="btn btn-warning btn-md">Submit</button>
 			                                          </div>
-			                            </div>
+                                  </div>
+                                  <div class="row">
+                                                    <div class="alert alert-warning-alt fade in" style="width:50%; margin:1.5%;">    
+                                                         <strong>Chosen Parameter:</strong>&nbsp;&nbsp;<span id="pName"></span><br>
+                                                         <strong>Description:</strong>&nbsp;&nbsp;<span id="pDesc"></span><br>
+                                                         <strong>Minimum Value:</strong>&nbsp;&nbsp;<span id="pMin"></span><br>
+                                                         <strong>Maximum Value:</strong>&nbsp;&nbsp;<span id="pMax"></span><br>
+                                                     </div>
+                                  </div>
+                                                <!-- <div class="col-xs-3">
+                                                    <div class="alert alert-warning-alt fade in" style="width:50%">    
+                                                         <strong>Chosen Parameter:</strong>&nbsp;&nbsp;<span id="pName"></span><br>
+                                                         <strong>Description:</strong>&nbsp;&nbsp;<span id="pDesc"></span><br>
+                                                         <strong>Minimum Value:</strong>&nbsp;&nbsp;<span id="pMin"></span><br>
+                                                         <strong>Maximum Value:</strong>&nbsp;&nbsp;<span id="pMax"></span><br>
+                                                     </div>
+                                                </div> -->
+			                            
 			                            
 			                            <div class="row">
-			                                <div class="col-xs-2"></div>
-			                                <p class="h4">&nbsp;&nbsp;&nbsp;Select HRU's based on below parameter constraints:</p>
+			                                <div class="col-xs-2"></div><br>
+			                                <p class="h4">&nbsp;&nbsp;&nbsp;Apply new parameter value to HRU's filtered out based on below parameter contraints:</p>
 			                                <div class="col-xs-2"></div>
 			                            </div>
 			                            <div class="row">
@@ -264,11 +281,11 @@
 			                                <div class="col-xs-2"></div>
 			                                <div class="col-xs-2"></div>
 			                                <div class="col-xs-1">
-			                                    <a  id="addParam" role="button"><span class="glyphicon glyphicon-plus-sign"  style="color:green;">ADD</span></a>
+			                                    <a id="addParam" role="button"><span class="glyphicon glyphicon-plus-sign"  style="color:green;">ADD</span></a>
 			                                </div>
 			                                <div class="col-xs-1">
-			                                <a id="deleteParam" role="button"><span class="glyphicon glyphicon-remove-sign"  style="color:red;">DELETE</span></a>
-			                                </div><br><br>
+			                                    <a id="deleteParam" role="button"><span class="glyphicon glyphicon-remove-sign"  style="color:red;">DELETE</span></a>
+			                                </div>
 			                            </div>
 
 
@@ -320,25 +337,25 @@
 			                                                <label for="changeParameterHG">Choose Parameter :</label>
 			                                                <select class="form-control show-list-param" id="changeParameterHG" name="changeParameterHG"> 
 			                                                </select>
-			                                                <br><br><br>
+			                                        
 			                                          </div>
 			                                          <div class="col-xs-3">
 			                                             <label for="selectParameter">New Value: </label>
 			                                             <input class="form-control input-sm onlyNumeric" type="number" step="0.000000000000001" name="changeToValHG" id="changeToValHG" title ="Enter a numeric value" required>
 			                                          </div>
 			                                          <div class="col-xs-2">
-			                                              <br><button id="applyGrid" type="button" class="btn btn-warning btn-md">Apply to Grid</button><br><br><br>
+			                                              <br><button id="applyGrid" type="button" class="btn btn-warning btn-md">Apply to Grid</button>
 			                                          </div>
 			                                          <div class="col-xs-2">
 			                                              <br><button id="saveToFile" type="button" class="btn btn-warning btn-md">Save to File</button>
 			                                          </div>
 			                            </div>
                                   <div class="row">
-                                      <div class="alert alert-warning-alt fade in" style="width:50%">    
-                                           <strong>Chosen Parameter:</strong>&nbsp;&nbsp;<span id="pName"></span><br>
-                                           <strong>Description:</strong>&nbsp;&nbsp;<span id="pDesc"></span><br>
-                                           <strong>Minimum Value:</strong>&nbsp;&nbsp;<span id="pMin"></span><br>
-                                           <strong>Maximum Value:</strong>&nbsp;&nbsp;<span id="pMax"></span><br>
+                                      <div class="alert alert-warning-alt fade in" style="width:50%; margin:1.5%;">    
+                                           <strong>Chosen Parameter:</strong>&nbsp;&nbsp;<span id="pNameHG"></span><br>
+                                           <strong>Description:</strong>&nbsp;&nbsp;<span id="pDescHG"></span><br>
+                                           <strong>Minimum Value:</strong>&nbsp;&nbsp;<span id="pMinHG"></span><br>
+                                           <strong>Maximum Value:</strong>&nbsp;&nbsp;<span id="pMaxHG"></span><br>
 
                                        </div>
                                   </div>
@@ -354,14 +371,6 @@
 
 			                         </div>
 			              </div>
-				    </div>
-				    <div id="menu2" class="tab-pane fade">
-				      <h3>Menu 2</h3>
-				      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
-				    </div>
-				    <div id="menu3" class="tab-pane fade">
-				      <h3>Menu 3</h3>
-				      <p>Eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
 				    </div>
 				  </div>
 				</div>

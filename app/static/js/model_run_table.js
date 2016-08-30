@@ -5,8 +5,8 @@ $(document).ready(function(){
 	var inputJson;
 
 	// set up the canvas size
-	var cellWidth = 10;
-	var cellHeight = 10;
+	var cellWidth = 12;
+	var cellHeight = 12;
 
 	// canvas col and row num
 	var dataX;
@@ -404,7 +404,6 @@ $(document).ready(function(){
                      	var hru = chosenAreaInfo[i].chosenArea[q];
                      	var row = hru/96;
 						var col = hru%96;
-						console.log('jose is panda:'+inputVal.toString());
 						// +3 coz of the offset
                         ctx.fillText(inputVal.toString(),3+cellWidth*col,3+cellHeight*row,cellHeight);
                      }
