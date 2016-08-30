@@ -378,6 +378,8 @@ $(document).ready(function(){
 	      chosenHRU=[];
 	    });
 
+
+
         $('#applyGrid').click(function(){
 
         	if($.trim($('#changeToValHG').val()) == ''){
@@ -417,18 +419,18 @@ $(document).ready(function(){
             	}
 
             }
-			updateMapOverlay();
+            updateMapOverlay();
+
          });
 
-
-
-	    $('#saveToFile').click(function(){
+        $('#saveToFile').click(function(){
 	 
 	       if($.trim($('#changeToValHG').val()) == ''){
 		        alert('Sorry! Some fields are empty. Please fill and try again.'); 
 		        return false; 
 	       }
-         
+
+	             
 	        $.ajax({
 		            type : "POST",
 		            url : "/api/updateToParamFile",
@@ -436,15 +438,25 @@ $(document).ready(function(){
 		            {
 		              chosenAreaInfo: chosenAreaInfo
 		            }),
-		            dataType: 'json',
+		            //dataType: 'json',
 		            contentType: 'application/json',
 		            success: function(result) {
+		                       $('#saveToFile').text("Saved");
+		                       $("#saveToFile").removeClass("btn-warning");
+		                       $("#saveToFile").addClass("btn-success");
 
+		                       setTimeout(function() {
+								    $('#saveToFile').text("Save To File");
+								    $("#saveToFile").removeClass("btn-success");
+								    $("#saveToFile").addClass("btn-warning")
+								}, 2500); 
 		            }
-		        });
+		    });
 	    });
         
 
+
+	   
 
 	    $('#confirmElevationButton').click(function(){
 	      changeVegByElevation(vegCurrent, elevationInfo, dataX, dataY);
@@ -545,6 +557,13 @@ $(document).ready(function(){
 		$('#step-2-title-id').append("<h5>2. Modify The Chosen Model Run Temperature</h5>");
 
 		$('#confirmTemperatureButton').on("click", function() {
+
+
+
+
+
+
+
 			showParamDetails();
 			var inputVal = $('#temperatureModifierID').val();
 			// console.log('input value is '+inputVal.toString());
