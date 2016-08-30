@@ -9,10 +9,32 @@ $(function(){
    	   $('#deleteParam').hide();
    	   // template0 = $('.repeat-parameter').first();
    }
+   //showParamDetails();
 });
 
 function forceNumeric() {
      $(".onlyNumeric").ForceNumericOnly();
+}
+
+function showParamDetails(){
+      chosenParamVal = $('#changeParameterHG').val();
+
+      $.ajax({
+            type : "GET",
+            url : "/api/get-chosen-parameter-details",
+            data:{
+              chosenParam: chosenParamVal
+            },
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function(result) {
+                $('#pName').text(result.chosenParam_name)
+                $('#pDesc').text(result.layer_desc)
+                $('#pMin').text(result.chosenParam_minVal)
+                $('#pMax').text(result.chosenParam_maxVal)
+   
+            }
+         });
 }
 
 
@@ -108,11 +130,19 @@ $(document).on('change', 'select[class="form-control sel_cond"]', function () {
 
 
 
+$(document).on('change', 'select[class="form-control show-list-param"]', function () {
+      showParamDetails();
+  });
+
+
+
+
+
 
 $(document).on('click', '#submitParams', function () {
 
       var flag = true;
-      var template = $('.panel-body');
+      var template = $('#hruFromParam');
       template.find("input").each(function (index, input) {
           if(!$(this).val()){
                flag = false;
@@ -167,8 +197,8 @@ $(document).on('click', '#submitParams', function () {
 
                 var cellWidth = 10;
                 var cellHeight = 10;
-                var dataX = 96
-                var dataY = 49
+                var dataX = 96;
+                var dataY = 49;
                 canvasWidth = cellWidth*dataX;
                 canvasHeight = cellHeight*dataY;
 

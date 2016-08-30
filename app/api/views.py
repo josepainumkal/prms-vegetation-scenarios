@@ -44,6 +44,26 @@ class HruCells(object):
         return [self.row,self.col]
 
 
+@api.route('/api/get-chosen-parameter-details', methods=['GET'])
+def getChosenParamDetails():
+    if request.method == 'GET':
+        chosenParam = request.args.get("chosenParam")
+        resp = {}
+        """generate json file from netcdf file"""
+
+        BASE_PARAMETER_NC = find_user_folder() + app.config['TEMP_PARAM']
+        handle = netCDF4.Dataset(BASE_PARAMETER_NC,'r')
+
+        resp['chosenParam_name'] = chosenParam
+        resp['chosenParam_maxVal'] = np.amax(handle[chosenParam][:].tolist())
+        resp['chosenParam_minVal'] = np.amin(handle[chosenParam][:].tolist())
+
+        if 'layer_desc' in handle[chosenParam].ncattrs():
+            resp['layer_desc'] = handle[chosenParam].layer_desc
+
+        return json.dumps(resp)
+
+
 
 @api.route('/api/get-parameter-list', methods=['GET'])
 def getParamList():
@@ -708,3 +728,81 @@ def prmsparam_submit():
 
     handle.close()
     return json.dumps(resp)
+
+def get2DArrayIndex (gridValue):
+	col = gridValue % 96
+	row = gridValue / 96
+	return row,col
+
+
+@api.route('/api/updateToParamFile', methods=['POST'])
+def updateToParamFile():
+    gc.collect()
+    BASE_PARAMETER_NC = find_user_folder() + app.config['TEMP_PARAM']
+    handle = netCDF4.Dataset(BASE_PARAMETER_NC,'a')
+
+
+    chosenAreaInfo = request.json['chosenAreaInfo']
+    app.logger.debug('jose is a panda')
+    # app.logger.debug(chosenAreaInfo)
+    # app.logger.debug(len(chosenAreaInfo))
+
+    paramMap = {}
+    paramValueMap ={}
+
+    for i in chosenAreaInfo:
+        paramName = i['paramName']
+        paramVal = i['paramVal']
+        gridNos = i['chosenArea']
+
+        if paramName in paramMap:
+            paramValueMap = paramMap[paramName]
+            if paramVal in paramValueMap:
+                paramValueMap[paramVal] = paramValueMap[paramVal] + gridNos
+            else:
+                paramValueMap[paramVal] = gridNos
+        else:
+            paramValueMap = {}
+            paramValueMap[paramVal] = gridNos
+            paramMap[paramName] = paramValueMap
+
+        app.logger.debug("printing parammaps***********************")
+        app.logger.debug(paramMap)
+
+
+    #updating in the values of param handle
+    for i in paramMap:
+    	temp=np.array([[None]*96]*49)
+
+        paramName = i
+        valueMap = paramMap[i]
+       
+        for value in valueMap:
+            gridNoList = valueMap[value]
+            for g in gridNoList:
+                row,col = get2DArrayIndex(g)
+                # app.logger.debug("ROW COL")
+                # app.logger.debug(row)
+                # app.logger.debug(col)
+
+                temp[row][col] = value
+
+        for i in xrange(49):
+            for j in xrange(96):
+                if temp[i][j] == None:
+                   temp[i][j] = handle.variables[paramName][:][i][j]
+
+        handle.variables[paramName][:] = temp
+        app.logger.debug("HERE COMES MY TEMP")
+        app.logger.debug(temp)
+
+
+    handle.close()
+
+    # app.logger.debug("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFParam map i contructed is below")
+    # app.logger.debug(paramMap)
+    return "success"
+
+
+    # for i in len(chosenAreaInfo):
+    #     app.logger.debug(i['paramName']

@@ -322,6 +322,8 @@ $(document).ready(function(){
 	    .mousedown(function(evt){
 	      isMousePressing = true;
 	    })
+
+
 	    .mousemove(function(evt){
 	      // record the first mouse position
 	      if(isDragging==false && isMousePressing==true)
@@ -339,6 +341,9 @@ $(document).ready(function(){
 	        changeCanvasCellColor(secondPosition,"#FFFF00");
 	      }
 	    })
+
+
+
 	    .mouseup(function(evt){
 	      isMousePressing = false;
 	      // choose single cell
@@ -350,6 +355,8 @@ $(document).ready(function(){
 	        secondPosition = firstPosition;
 	        clickTime = 2;
 	        changeCanvasCellColor(secondPosition,"#FF00FF");
+
+
 	      }
 	      // choose an area
 	      else if(isDragging==true)
@@ -358,11 +365,87 @@ $(document).ready(function(){
 	      }
 	       // push the final chosen area into chosenAreaInfo
 	      // get the current chosen color number
-	      var colorOptNum = parseInt($('#vegetation-type-selector label.active input').val());
-	            //parseInt($('input[name="vegcode-select"]:checked').val());
-	      chosenAreaInfo.push({colorNum:colorOptNum,chosenArea:chosenHRU});
+	      var paramVal = parseFloat($('#changeToValHG').val());
+	      var paramName =  $('#changeParameterHG').val();
+	      var updateHRU = [];
+	      $.each(chosenHRU, function(i, el){
+		    if($.inArray(el, updateHRU) === -1) updateHRU.push(el);
+		  });
+	      console.log(updateHRU);
+	      chosenAreaInfo.push({paramName:paramName,paramVal:paramVal,chosenArea:updateHRU});
+	      //parseInt($('input[name="vegcode-select"]:checked').val());
+	      // chosenAreaInfo.push({colorNum:colorOptNum,chosenArea:chosenHRU});
 	      chosenHRU=[];
 	    });
+
+        $('#applyGrid').click(function(){
+
+        	if($.trim($('#changeToValHG').val()) == ''){
+		        alert('Sorry! Some fields are empty. Please fill and try again.'); 
+		        return false; 
+	       }
+
+        	
+	      	// resetCanvas(vegCurrent);
+		    // update map overlay
+		    updateMapOverlay();
+
+        	var inputVal = $('#changeToValHG').val();
+        	var param = $('#changeParameterHG').val(); 
+
+			var c=document.getElementById("myCanvas");
+			var ctx=c.getContext("2d");
+			ctx.fillStyle = "#000000"
+			ctx.font="10px Georgia";
+
+            for(var i =0; i<chosenAreaInfo.length; i++){
+            	if (chosenAreaInfo[i].paramName == param && chosenAreaInfo[i].paramVal == inputVal){
+                     for(var q=0; q<chosenAreaInfo[i].chosenArea.length; q++){
+                     	var hru = chosenAreaInfo[i].chosenArea[q];
+                     	var row = hru/96;
+						var col = hru%96;
+						console.log('jose is panda:'+inputVal.toString());
+						// +3 coz of the offset
+                        ctx.fillText(inputVal.toString(),3+cellWidth*col,3+cellHeight*row,cellHeight);
+                     }
+		      			// var hru = chosenAreaInfo[i].chosenArea[0];
+		      			// var hru1 = chosenAreaInfo[i].chosenArea[chosenAreaInfo[i].chosenArea.length-1];
+		      			// var row = (hru+hru1)/192;
+		      			// var col = (parseInt(hru+hru1)/2)%96;
+		      			// console.log('jose is panda:'+row.toString());
+		      			// console.log('jose is panda1:'+col.toString());
+		      			// ctx.fillText(inputVal.toString(),3+10*col,3+10*row);
+            	}
+
+            }
+
+         });
+
+
+
+	    $('#saveToFile').click(function(){
+	 
+	       if($.trim($('#changeToValHG').val()) == ''){
+		        alert('Sorry! Some fields are empty. Please fill and try again.'); 
+		        return false; 
+	       }
+         
+	        $.ajax({
+		            type : "POST",
+		            url : "/api/updateToParamFile",
+		            data: JSON.stringify(
+		            {
+		              chosenAreaInfo: chosenAreaInfo
+		            }),
+		            dataType: 'json',
+		            contentType: 'application/json',
+		            success: function(result) {
+
+		            }
+		        });
+	    });
+        
+
 
 	    $('#confirmElevationButton').click(function(){
 	      changeVegByElevation(vegCurrent, elevationInfo, dataX, dataY);
@@ -463,10 +546,11 @@ $(document).ready(function(){
 		$('#step-2-title-id').append("<h5>2. Modify The Chosen Model Run Temperature</h5>");
 
 		$('#confirmTemperatureButton').on("click", function() {
+			showParamDetails();
 			var inputVal = $('#temperatureModifierID').val();
-			//console.log('input value is '+inputVal.toString());
+			// console.log('input value is '+inputVal.toString());
 			var tempCondition = $('#selTempCondition').val();
-			//console.log('operation is '+tempCondition);
+			// console.log('operation is '+tempCondition);
 
             
             if(tempCondition == 'Multiply by'){
@@ -499,7 +583,7 @@ $(document).ready(function(){
             	}       
 			}
 
-			console.log('temperature modification is done, factor is '+ inputVal.toString());
+			// console.log('temperature modification is done, factor is '+ inputVal.toString());
 
 			google.charts.setOnLoadCallback(drawChart);
 
